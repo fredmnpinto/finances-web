@@ -1,0 +1,119 @@
+<div class="max-w-7xl mx-auto px-4 py-6 space-y-8">
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">
+      This Month Overview
+    </h1>
+    <p class="text-sm text-gray-500">
+      <%= Date.current.strftime("%B %Y") %>
+    </p>
+  </div>
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <%= render "summary_card",
+    title: "Income",
+    value: number_to_currency(@income),
+    color: "text-green-600" %>
+    <%= render "summary_card",
+    title: "Expenses",
+    value: number_to_currency(@expenses),
+    color: "text-red-600" %>
+    <%= render "summary_card",
+    title: "Net",
+    value: number_to_currency(@net),
+    color: @net >= 0 ? "text-green-600" : "text-red-600" %>
+    <%= render "summary_card",
+    title: "Avg / Day",
+    value: number_to_currency(@avg_daily),
+    color: "text-gray-900" %>
+    <%= render "summary_card",
+    title: "Days Left",
+    value: (Date.current.end_of_month.day - Date.current.day),
+    color: "text-gray-900" %>
+  </div>
+  <!-- Spend Pace -->
+  <div class="bg-white rounded-xl shadow p-6 space-y-4">
+    <h2 class="text-lg font-medium text-gray-900">
+      Spend Pace
+    </h2>
+
+    <% expected_spend = @expected_spend_this_month %>
+    <% pace_pct = expected_spend.zero? ? 0 : (@expenses / expected_spend * 100).round %>
+
+    <div class="w-full bg-gray-200 rounded-full h-3">
+      <div
+        class="h-3 rounded-full <%= pace_pct > 100 ? 'bg-red-500' : 'bg-green-500' %>"
+        style="width: <%= [pace_pct, 100].min %>%"
+      >
+      </div>
+    </div>
+
+    <p class="text-sm text-gray-600">
+      <strong><%= pace_pct %>%</strong>
+      of projected monthly spend used
+    </p>
+  </div>
+  <!-- Two Column Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Largest Transactions -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">
+        Largest Transactions
+      </h2>
+
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b">
+            <th class="pb-2">Date</th>
+            <th>Description</th>
+            <th class="text-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @largest_expenses.each do |tx| %>
+            <tr class="border-b last:border-0">
+              <td class="py-2 text-gray-600">
+                <%= tx.date.strftime("%b %d") %>
+              </td>
+              <td class="py-2">
+                <%= tx.description %>
+              </td>
+              <td class="py-2 text-right text-red-600 font-medium">
+                <%= number_to_currency(tx.amount) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <!-- Category Breakdown -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">
+        Expenses by Category
+      </h2>
+
+      <ul class="space-y-3">
+        <% @by_category.each do |category, amount| %>
+          <% pct = (@expenses.zero? ? 0 : (amount.abs / @expenses * 100).round) %>
+
+          <li>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-700">
+                <%= category || "Uncategorized" %>
+              </span>
+              <span class="text-gray-900 font-medium">
+                <%= number_to_currency(amount.abs) %>
+              </span>
+            </div>
+
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+              <div class="h-2 rounded-full bg-blue-500" style="width: <%= pct %>%">
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+  </div>
+</div>
