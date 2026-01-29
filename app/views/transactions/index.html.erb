@@ -1,66 +1,63 @@
 <div class="max-w-7xl mx-auto px-4 py-6 space-y-8">
-  <!-- Header -->
-  <div>
+  <!-- Month Navigation -->
+  <div class="flex items-center justify-between">
+    <%= link_to "← Previous",
+    root_path(year: (@month - 1.month).year, month: (@month - 1.month).month),
+    class: "text-sm text-gray-600 hover:text-gray-900" %>
+
     <h1 class="text-2xl font-semibold text-gray-900">
-      This Month Overview
+      <%= @month.strftime("%B %Y") %>
     </h1>
-    <p class="text-sm text-gray-500">
-      <%= Date.current.strftime("%B %Y") %>
-    </p>
+
+    <% if @month < Date.current.beginning_of_month %>
+      <%= link_to "Next →",
+      root_path(year: (@month + 1.month).year, month: (@month + 1.month).month),
+      class: "text-sm text-gray-600 hover:text-gray-900" %>
+    <% else %>
+      <span class="text-sm text-gray-400">Next →</span>
+    <% end %>
   </div>
   <!-- Summary Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-    <%= render "summary_card",
-    title: "Income",
-    value: number_to_currency(@income),
-    color: "text-green-600" %>
-    <%= render "summary_card",
-    title: "Expenses",
-    value: number_to_currency(@expenses),
-    color: "text-red-600" %>
-    <%= render "summary_card",
-    title: "Net",
-    value: number_to_currency(@net),
-    color: @net >= 0 ? "text-green-600" : "text-red-600" %>
-    <%= render "summary_card",
-    title: "Avg / Day",
-    value: number_to_currency(@avg_daily),
-    color: "text-gray-900" %>
-    <%= render "summary_card",
-    title: "Days Left",
-    value: (Date.current.end_of_month.day - Date.current.day),
-    color: "text-gray-900" %>
-  </div>
-  <!-- Spend Pace -->
-  <div class="bg-white rounded-xl shadow p-6 space-y-4">
-    <h2 class="text-lg font-medium text-gray-900">
-      Spend Pace
-    </h2>
-
-    <% expected_spend = @expected_spend_this_month %>
-    <% pace_pct = expected_spend.zero? ? 0 : (@expenses / expected_spend * 100).round %>
-
-    <div class="w-full bg-gray-200 rounded-full h-3">
-      <div
-        class="h-3 rounded-full <%= pace_pct > 100 ? 'bg-red-500' : 'bg-green-500' %>"
-        style="width: <%= [pace_pct, 100].min %>%"
-      >
-      </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl shadow p-4">
+      <p class="text-sm text-gray-500">Income</p>
+      <p class="text-xl font-semibold text-green-600">
+        <%= number_to_currency(@income) %>
+      </p>
     </div>
 
-    <p class="text-sm text-gray-600">
-      <strong><%= pace_pct %>%</strong>
-      of projected monthly spend used
-    </p>
-  </div>
-  <!-- Two Column Section -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Largest Transactions -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">
-        Largest Transactions
-      </h2>
+    <div class="bg-white rounded-xl shadow p-4">
+      <p class="text-sm text-gray-500">Expenses</p>
+      <p class="text-xl font-semibold text-red-600">
+        <%= number_to_currency(@expenses) %>
+      </p>
+    </div>
 
+    <div class="bg-white rounded-xl shadow p-4">
+      <p class="text-sm text-gray-500">Net</p>
+      <p
+        class="text-xl font-semibold <%= @net >= 0 ? 'text-green-600' : 'text-red-600' %>"
+      >
+        <%= number_to_currency(@net) %>
+      </p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-4">
+      <p class="text-sm text-gray-500">
+        Avg Daily Spend
+      </p>
+      <p class="text-xl font-semibold text-gray-900">
+        <%= number_to_currency(@avg_daily) %>
+      </p>
+    </div>
+  </div>
+  <!-- Largest Expenses -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">
+      Largest Expenses
+    </h2>
+
+    <% if @largest_expenses.any? %>
       <table class="w-full text-sm">
         <thead>
           <tr class="text-left text-gray-500 border-b">
@@ -85,21 +82,27 @@
           <% end %>
         </tbody>
       </table>
-    </div>
-    <!-- Category Breakdown -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">
-        Expenses by Category
-      </h2>
+    <% else %>
+      <p class="text-sm text-gray-500">
+        No expenses for this month.
+      </p>
+    <% end %>
+  </div>
+  <!-- Category Breakdown -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">
+      Expenses by Category
+    </h2>
 
+    <% if @by_category.any? %>
       <ul class="space-y-3">
         <% @by_category.each do |category, amount| %>
-          <% pct = (@expenses.zero? ? 0 : (amount.abs / @expenses * 100).round) %>
+          <% pct = @expenses.zero? ? 0 : (amount.abs / @expenses * 100).round %>
 
           <li>
             <div class="flex justify-between text-sm">
               <span class="text-gray-700">
-                <%= category || "Uncategorized" %>
+                <%= category %>
               </span>
               <span class="text-gray-900 font-medium">
                 <%= number_to_currency(amount.abs) %>
@@ -113,7 +116,11 @@
           </li>
         <% end %>
       </ul>
-    </div>
-
+    <% else %>
+      <p class="text-sm text-gray-500">
+        No categorized expenses.
+      </p>
+    <% end %>
   </div>
+
 </div>
