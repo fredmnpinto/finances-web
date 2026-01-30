@@ -10,8 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 0) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_29_231232) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "transactions", id: :serial, force: :cascade do |t|
+    t.decimal "amount", null: false
+    t.decimal "balance"
+    t.float "category_confidence", limit: 24
+    t.text "category_source"
+    t.text "confirmed_category"
+    t.datetime "confirmed_category_at", precision: nil
+    t.datetime "created_at", precision: nil, default: -> { "CURRENT_TIMESTAMP" }
+    t.date "date", null: false
+    t.text "description", null: false
+    t.text "source_file"
+    t.text "suggested_category"
+    t.integer "transaction_type"
+    t.date "value_date"
+
+    t.unique_constraint ["date", "description", "amount", "balance"], name: "transactions_date_description_amount_balance_key"
+  end
 end
