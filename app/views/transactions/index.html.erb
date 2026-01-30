@@ -1,126 +1,103 @@
-<div class="max-w-7xl mx-auto px-4 py-6 space-y-8">
-  <!-- Month Navigation -->
+<div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+  <!-- Header -->
   <div class="flex items-center justify-between">
-    <%= link_to "← Previous",
-    root_path(year: (@month - 1.month).year, month: (@month - 1.month).month),
-    class: "text-sm text-gray-600 hover:text-gray-900" %>
-
     <h1 class="text-2xl font-semibold text-gray-900">
+      Transactions —
       <%= @month.strftime("%B %Y") %>
     </h1>
 
-    <% if @month < Date.current.beginning_of_month %>
-      <%= link_to "Next →",
-      root_path(year: (@month + 1.month).year, month: (@month + 1.month).month),
-      class: "text-sm text-gray-600 hover:text-gray-900" %>
-    <% else %>
-      <span class="text-sm text-gray-400">Next →</span>
+    <%= link_to "← Back to dashboard",
+    dashboard_path(year: @month.year, month: @month.month),
+    class: "text-sm text-gray-600 hover:text-gray-900" %>
+  </div>
+  <!-- Table Filters -->
+  <div class="bg-white rounded-xl shadow p-4">
+    <%= form_with url: transactions_path, method: :get, local: true, class: "grid grid-cols-1 sm:grid-cols-4 gap-4" do %>
+
+      <%= hidden_field_tag :year, @month.year %>
+      <%= hidden_field_tag :month, @month.month %>
+      <!-- Search -->
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">
+          Search
+        </label>
+        <%= text_field_tag :q,
+        params[:q],
+        placeholder: "Description contains…",
+        class: "w-full rounded-md border-gray-300 text-sm" %>
+      </div>
+      <!-- Category -->
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">
+          Category
+        </label>
+        <%= select_tag :category,
+        options_for_select(@categories, params[:category]),
+        include_blank: "All categories",
+        class: "w-full rounded-md border-gray-300 text-sm" %>
+      </div>
+      <!-- Amount Type -->
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">
+          Transaction Type
+        </label>
+        <%= select_tag :type,
+        options_for_select(
+          [["All", nil]] + @transaction_types.map { |tt| [tt.titleize, tt] },
+          params[:type],
+        ),
+        class: "w-full rounded-md border-gray-300 text-sm" %>
+      </div>
+      <!-- Actions -->
+      <div class="flex items-end gap-2">
+        <%= submit_tag "Filter",
+        class: "px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" %>
+
+        <%= link_to "Reset",
+        transactions_path(year: @month.year, month: @month.month),
+        class: "text-sm text-gray-600 hover:text-gray-900" %>
+      </div>
+
     <% end %>
   </div>
-  <!-- Summary Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="bg-white rounded-xl shadow p-4">
-      <p class="text-sm text-gray-500">Income</p>
-      <p class="text-xl font-semibold text-green-600">
-        <%= number_to_currency(@income) %>
-      </p>
-    </div>
+  <!-- Transactions Table -->
+  <div class="bg-white rounded-xl shadow overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50">
+        <tr class="text-left text-gray-500">
+          <th class="px-4 py-3">Date</th>
+          <th class="px-4 py-3">Description</th>
+          <th class="px-4 py-3">Category</th>
+          <th class="px-4 py-3 text-right">Amount</th>
+        </tr>
+      </thead>
 
-    <div class="bg-white rounded-xl shadow p-4">
-      <p class="text-sm text-gray-500">Expenses</p>
-      <p class="text-xl font-semibold text-red-600">
-        <%= number_to_currency(@expenses) %>
-      </p>
-    </div>
+      <tbody>
+        <% @transactions.each do |tx| %>
+          <tr class="border-t last:border-b">
+            <td class="px-4 py-3 text-gray-600">
+              <%= tx.date.strftime("%Y-%m-%d") %>
+            </td>
 
-    <div class="bg-white rounded-xl shadow p-4">
-      <p class="text-sm text-gray-500">Net</p>
-      <p
-        class="text-xl font-semibold <%= @net >= 0 ? 'text-green-600' : 'text-red-600' %>"
-      >
-        <%= number_to_currency(@net) %>
-      </p>
-    </div>
+            <td class="px-4 py-3">
+              <%= tx.description %>
+            </td>
 
-    <div class="bg-white rounded-xl shadow p-4">
-      <p class="text-sm text-gray-500">
-        Avg Daily Spend
-      </p>
-      <p class="text-xl font-semibold text-gray-900">
-        <%= number_to_currency(@avg_daily) %>
-      </p>
-    </div>
-  </div>
-  <!-- Largest Expenses -->
-  <div class="bg-white rounded-xl shadow p-6">
-    <h2 class="text-lg font-medium text-gray-900 mb-4">
-      Largest Expenses
-    </h2>
+            <td class="px-4 py-3 text-gray-700">
+              <%= tx.confirmed_category || tx.suggested_category || "Uncategorized" %>
+            </td>
 
-    <% if @largest_expenses.any? %>
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="text-left text-gray-500 border-b">
-            <th class="pb-2">Date</th>
-            <th>Description</th>
-            <th class="text-right">Amount</th>
+            <td
+              class="
+                px-4 py-3 text-right font-medium <%= tx.amount < 0 ? 'text-red-600' : 'text-green-600' %>
+              "
+            >
+              <%= number_to_currency(tx.amount) %>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <% @largest_expenses.each do |tx| %>
-            <tr class="border-b last:border-0">
-              <td class="py-2 text-gray-600">
-                <%= tx.date.strftime("%b %d") %>
-              </td>
-              <td class="py-2">
-                <%= tx.description %>
-              </td>
-              <td class="py-2 text-right text-red-600 font-medium">
-                <%= number_to_currency(tx.amount) %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    <% else %>
-      <p class="text-sm text-gray-500">
-        No expenses for this month.
-      </p>
-    <% end %>
-  </div>
-  <!-- Category Breakdown -->
-  <div class="bg-white rounded-xl shadow p-6">
-    <h2 class="text-lg font-medium text-gray-900 mb-4">
-      Expenses by Category
-    </h2>
-
-    <% if @by_category.any? %>
-      <ul class="space-y-3">
-        <% @by_category.each do |category, amount| %>
-          <% pct = @expenses.zero? ? 0 : (amount.abs / @expenses * 100).round %>
-
-          <li>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-700">
-                <%= category %>
-              </span>
-              <span class="text-gray-900 font-medium">
-                <%= number_to_currency(amount.abs) %>
-              </span>
-            </div>
-
-            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-              <div class="h-2 rounded-full bg-blue-500" style="width: <%= pct %>%">
-              </div>
-            </div>
-          </li>
         <% end %>
-      </ul>
-    <% else %>
-      <p class="text-sm text-gray-500">
-        No categorized expenses.
-      </p>
-    <% end %>
+      </tbody>
+    </table>
   </div>
 
 </div>

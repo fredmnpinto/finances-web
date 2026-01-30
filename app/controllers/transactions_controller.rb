@@ -3,39 +3,59 @@ class TransactionsController < ApplicationController
     @month = resolve_month(params[:year], params[:month])
     @range = @month.beginning_of_month..@month.end_of_month
 
-    tx = Transaction.where(date: @range)
+    @transactions =
+      Transaction
+        .where(date: @range)
+        .then { |rel| filter_by_category(rel) }
+        .then { |rel| filter_by_search(rel) }
+        .then { |rel| filter_by_amount_type(rel) }
+        .then { |rel| filter_by_transaction_type(rel) }
+        .order(date: :desc, id: :desc)
 
-    @income = tx.where("amount > 0").sum(:amount)
-    @expenses = tx.where("amount < 0").sum(:amount).abs
-    @net = @income - @expenses
-
-    @days_elapsed =
-      if @month == Date.current.beginning_of_month
-        Date.current.day
-      else
-        @month.end_of_month.day
-      end
-
-    @avg_daily = @days_elapsed.zero? ? 0 : @expenses / @days_elapsed
-    @largest_expenses = tx.where("amount < 0")
-                           .order(amount: :asc)
-                           .limit(5)
-
-    @by_category = tx.select("coalesce(confirmed_category, suggested_category)")
-      .where("amount < 0")
-      .group("coalesce(confirmed_category, suggested_category)")
-      .sum(:amount)
+    @transaction_types = Transaction.transaction_types.keys
+    Rails.logger.info "transaction_types=#{@transaction_types}"
+    @categories =
+      Transaction
+        .where(date: @range)
+        .distinct
+        .select("COALESCE(confirmed_category, suggested_category) as category")
+        .order("category")
+        .map(&:category)
   end
+
 
   private
 
-  def resolve_month(year, month)
-    if year.present? && month.present?
-      Date.new(year.to_i, month.to_i, 1)
+
+  def filter_by_transaction_type(rel)
+    return rel if params[:transaction_type].blank?
+
+    rel.where(transaction_type: params[:transaction_type])
+  end
+
+  def filter_by_category(rel)
+    return rel if params[:category].blank?
+
+    rel.where(
+      "COALESCE(confirmed_category, suggested_category) = ?",
+      params[:category]
+    )
+  end
+
+  def filter_by_search(rel)
+    return rel if params[:q].blank?
+
+    rel.where("description ILIKE ?", "%#{params[:q]}%")
+  end
+
+  def filter_by_amount_type(rel)
+    case params[:type]
+    when "expenses"
+      rel.where("amount < 0")
+    when "income"
+      rel.where("amount > 0")
     else
-      Date.current.beginning_of_month
+      rel
     end
-  rescue ArgumentError
-    Date.current.beginning_of_month
   end
 end
