@@ -3,9 +3,10 @@ class TransactionsController < ApplicationController
     @month = resolve_month(params[:year], params[:month])
     @range = @month.beginning_of_month..@month.end_of_month
 
+    base_transactions = current_user.transactions.where(date: @range)
+
     @transactions =
-      Transaction
-        .where(date: @range)
+      base_transactions
         .then { |rel| filter_by_category(rel) }
         .then { |rel| filter_by_search(rel) }
         .then { |rel| filter_by_amount_type(rel) }
@@ -15,8 +16,7 @@ class TransactionsController < ApplicationController
     @transaction_types = Transaction.transaction_types.keys
     Rails.logger.info "transaction_types=#{@transaction_types}"
     @categories =
-      Transaction
-        .where(date: @range)
+      base_transactions
         .distinct
         .select("COALESCE(confirmed_category, suggested_category) as category")
         .order("category")

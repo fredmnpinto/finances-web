@@ -3,7 +3,7 @@ class DashboardController < ApplicationController
     @month = resolve_month(params[:year], params[:month])
     @range = @month.beginning_of_month..@month.end_of_month
 
-    tx = Transaction.where(date: @range)
+    tx = current_user.transactions.where(date: @range)
 
     @income = tx.income.sum(:amount)
     @expenses = tx.expense.sum(:amount).abs

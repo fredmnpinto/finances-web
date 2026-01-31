@@ -2,7 +2,7 @@
   <!-- Month Navigation -->
   <div class="flex items-center justify-between">
     <%= link_to "← Previous",
-    root_path(year: (@month - 1.month).year, month: (@month - 1.month).month),
+    authenticated_root_path(year: (@month - 1.month).year, month: (@month - 1.month).month),
     class: "text-sm text-gray-600 hover:text-gray-900" %>
 
     <h1 class="text-2xl font-semibold text-gray-900">
@@ -11,7 +11,7 @@
 
     <% if @month < Date.current.beginning_of_month %>
       <%= link_to "Next →",
-      root_path(year: (@month + 1.month).year, month: (@month + 1.month).month),
+      authenticated_root_path(year: (@month + 1.month).year, month: (@month + 1.month).month),
       class: "text-sm text-gray-600 hover:text-gray-900" %>
     <% else %>
       <span class="text-sm text-gray-400">Next →</span>
