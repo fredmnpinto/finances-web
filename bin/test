@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}🧪 Running RSpec Tests for Finances Web${NC}"
+echo
+
+# Run tests with coverage
+if bundle exec rspec --format documentation --format progress; then
+    echo -e "\n${GREEN}✅ All tests passed!${NC}"
+    echo -e "${BLUE}📊 Test coverage available in coverage/ directory${NC}"
+else
+    TEST_EXIT_CODE=$?
+    echo -e "\n${RED}❌ Tests failed with exit code: $TEST_EXIT_CODE${NC}"
+    exit $TEST_EXIT_CODE
+fi

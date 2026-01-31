@@ -6,7 +6,7 @@ gem "rails", "~> 8.1.2"
 gem "propshaft"
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
-# Use the Puma web server [https://github.com/puma/puma]
+# Use Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
@@ -28,7 +28,7 @@ gem "devise"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
-# Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
+# Use database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
@@ -45,9 +45,13 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+group :development do
+  gem "letter_opener", "~> 1.8"
+end
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "debug" # , platforms: %i[ mri windows ], require: "debug/prelude"
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
@@ -57,6 +61,37 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+end
+
+group :test do
+  # RSpec testing framework
+  gem "rspec-rails", "~> 6.0"
+
+  # Test data factory
+  gem "factory_bot_rails", "~> 6.2"
+
+  # Database cleaning between tests
+  gem "database_cleaner-active_record", "~> 2.0"
+
+  # Matchers for testing
+  gem "shoulda-matchers", "~> 5.0"
+
+  # Time travel in tests
+  gem "timecop", "~> 0.9"
+
+  # Faker for test data
+  gem "faker", "~> 3.0"
+
+  # Capybara for feature testing
+  gem "capybara", "~> 3.0"
+
+  # Web drivers for JavaScript testing
+  gem "selenium-webdriver", "~> 4.0"
+
+  # Code coverage
+  gem "simplecov", "~> 0.21"
+
+  gem "rails-controller-testing"
 end
 
 group :development do
