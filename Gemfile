@@ -65,7 +65,7 @@ end
 
 group :test do
   # RSpec testing framework
-  gem "rspec-rails", "~> 6.0"
+  gem "rspec-rails", "~> 8.0"
 
   # Test data factory
   gem "factory_bot_rails", "~> 6.2"
