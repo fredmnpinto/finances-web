@@ -54,7 +54,7 @@ jobs:
         bundle exec rspec --format documentation --format RSpecJunitFormatter --out tmp/rspec.xml
         
     - name: Upload test results
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v2
       if: always()
       with:
         name: RSpec Results
