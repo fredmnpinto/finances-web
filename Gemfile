@@ -74,7 +74,7 @@ group :test do
   gem "database_cleaner-active_record", "~> 2.0"
 
   # Matchers for testing
-  gem "shoulda-matchers", "~> 5.0"
+  gem "shoulda-matchers", "~> 7.0"
 
   # Time travel in tests
   gem "timecop", "~> 0.9"
