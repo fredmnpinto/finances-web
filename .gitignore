@@ -6,6 +6,8 @@
 
 vendor/
 
+.direnv/
+
 # Ignore bundler config.
 /.bundle
 

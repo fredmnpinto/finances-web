@@ -25,9 +25,5 @@ pkgs.mkShell {
       bundle config set --local path '"'"'vendor/bundle'"'"'
       bundle install
     fi
-
-    zsh; exit
   '';
-
-  runScript = "zsh";
 }
