@@ -10,17 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_31_121854) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_17_100949) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "transactions", id: :serial, force: :cascade do |t|
     t.decimal "amount", null: false
     t.decimal "balance"
-    t.float "category_confidence", limit: 24
+    t.decimal "category_confidence"
     t.text "category_source"
     t.text "confirmed_category"
-    t.datetime "confirmed_category_at", precision: nil
+    t.datetime "confirmed_category_at"
     t.datetime "created_at", precision: nil, default: -> { "CURRENT_TIMESTAMP" }
     t.date "date", null: false
     t.text "description", null: false

@@ -47,6 +47,8 @@ gem "image_processing", "~> 1.2"
 
 group :development do
   gem "letter_opener", "~> 1.8"
+
+  gem "foreman"
 end
 
 group :development, :test do
