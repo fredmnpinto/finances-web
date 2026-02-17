@@ -17,6 +17,16 @@ Rails.application.routes.draw do
 
   get "dashboard", to: "dashboard#index"
   get "transactions", to: "transactions#index"
+  resources :transactions, only: [] do
+    collection do
+      get :categories
+      patch :bulk_update_categories
+      patch :confirm_all_suggested
+    end
+    member do
+      patch :confirm_category
+    end
+  end
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

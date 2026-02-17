@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+<div class="max-w-7xl mx-auto px-4 py-6 space-y-6" data-controller="transaction-bulk">
   <!-- Header -->
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-semibold text-gray-900">
@@ -6,13 +6,20 @@
       <%= @month.strftime("%B %Y") %>
     </h1>
 
-    <%= link_to "← Back to dashboard",
-    dashboard_path(year: @month.year, month: @month.month),
-    class: "text-sm text-gray-600 hover:text-gray-900" %>
+    <div class="flex items-center gap-4">
+      <%= button_to "Confirm all suggested",
+      confirm_all_suggested_transactions_path(year: @month.year, month: @month.month),
+      class: "px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700" %>
+
+      <%= link_to "← Back to dashboard",
+      dashboard_path(year: @month.year, month: @month.month),
+      class: "text-sm text-gray-600 hover:text-gray-900" %>
+    </div>
   </div>
+
   <!-- Table Filters -->
   <div class="bg-white rounded-xl shadow p-4">
-    <%= form_with url: transactions_path, method: :get, local: true, class: "grid grid-cols-1 sm:grid-cols-4 gap-4" do %>
+    <%= form_with url: transactions_path, method: :get, local: true, class: "grid grid-cols-1 sm:grid-cols-5 gap-4" do %>
 
       <%= hidden_field_tag :year, @month.year %>
       <%= hidden_field_tag :month, @month.month %>
@@ -48,6 +55,18 @@
         ),
         class: "w-full rounded-md border-gray-300 text-sm" %>
       </div>
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">
+          Status
+        </label>
+        <%= select_tag :category_confirmation_filter,
+        options_for_select(
+          [["Unconfirmed", "unconfirmed"], ["Confirmed", "confirmed"], ["All", "all"]],
+          @category_confirmation_filter
+        ),
+        class: "w-full rounded-md border-gray-300 text-sm" %>
+      </div>
       <!-- Actions -->
       <div class="flex items-end gap-2">
         <%= submit_tag "Filter",
@@ -60,21 +79,70 @@
 
     <% end %>
   </div>
+
+  <!-- Bulk Actions Toolbar -->
+  <div id="bulk-toolbar" data-transaction-bulk-target="toolbar" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-4 z-50">
+    <span data-transaction-bulk-target="count" class="font-medium">0</span>
+    <span class="text-gray-400">selected</span>
+    <div class="w-px h-6 bg-gray-700"></div>
+
+    <%= select_tag "bulk_category",
+    options_for_select(@categories),
+    include_blank: "Select category…",
+    id: "bulk-category-select",
+    class: "rounded-md border-0 bg-gray-800 text-sm text-white" %>
+
+    <button type="button"
+            data-action="click->transaction-bulk#bulkUpdateSelected"
+            class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
+      Update
+    </button>
+
+    <button type="button"
+            data-action="click->transaction-bulk#confirmSelected"
+            class="px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700">
+      Confirm as Suggested
+    </button>
+  </div>
+
+  <!-- Hidden Bulk Form -->
+  <%= form_with url: bulk_update_categories_transactions_path, method: :patch, id: "bulk-action-form" do %>
+    <%= hidden_field_tag :year, @month.year %>
+    <%= hidden_field_tag :month, @month.month %>
+    <%= hidden_field_tag :category_confirmation_filter, @category_confirmation_filter %>
+    <%= hidden_field_tag :transaction_ids, "", id: "bulk-ids-field" %>
+    <%= hidden_field_tag :category, "", id: "bulk-category-field" %>
+    <%= hidden_field_tag :action_type, "", id: "bulk-action-field" %>
+  <% end %>
+
   <!-- Transactions Table -->
   <div class="bg-white rounded-xl shadow overflow-hidden">
     <table class="w-full text-sm">
       <thead class="bg-gray-50">
         <tr class="text-left text-gray-500">
+          <th class="px-4 py-3 w-10">
+            <input type="checkbox"
+                   data-transaction-bulk-target="selectAll"
+                   data-action="change->transaction-bulk#toggleSelectAll"
+                   class="rounded border-gray-300">
+          </th>
           <th class="px-4 py-3">Date</th>
           <th class="px-4 py-3">Description</th>
           <th class="px-4 py-3">Category</th>
           <th class="px-4 py-3 text-right">Amount</th>
+          <th class="px-4 py-3 w-24"></th>
         </tr>
       </thead>
 
-      <tbody>
+      <tbody data-transaction-bulk-target="row">
         <% @transactions.each do |tx| %>
-          <tr class="border-t last:border-b">
+          <tr class="border-t last:border-b cursor-pointer hover:bg-gray-50"
+              data-transaction-id="<%= tx.id %>"
+              data-action="click->transaction-bulk#toggleSelect">
+            <td class="px-4 py-3" data-action="click->transaction-bulk#toggleSelect">
+              <input type="checkbox"
+                     class="rounded border-gray-300">
+            </td>
             <td class="px-4 py-3 text-gray-600">
               <%= tx.date.strftime("%Y-%m-%d") %>
             </td>
@@ -83,8 +151,22 @@
               <%= tx.description %>
             </td>
 
-            <td class="px-4 py-3 text-gray-700">
-              <%= tx.confirmed_category || tx.suggested_category || "Uncategorized" %>
+            <td class="px-4 py-3">
+              <% if tx.confirmed_category %>
+                <span class="inline-flex items-center gap-1 text-green-700">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <%= tx.confirmed_category %>
+                </span>
+              <% elsif tx.suggested_category %>
+                <div class="flex items-center gap-2">
+                  <span class="text-gray-700"><%= tx.suggested_category %></span>
+                  <span class="text-xs text-gray-400">(suggested)</span>
+                </div>
+              <% else %>
+                <span class="text-gray-400 italic">Uncategorized</span>
+              <% end %>
             </td>
 
             <td
@@ -94,6 +176,16 @@
             >
               <%= number_to_currency(tx.amount) %>
             </td>
+
+            <td class="px-4 py-3">
+              <% unless tx.confirmed_category || tx.suggested_category.nil? %>
+                <%= button_to "Confirm",
+                confirm_category_transaction_path(tx, return_params),
+                method: :patch,
+                class: "text-xs text-green-600 hover:text-green-800",
+                data: { confirm: "Confirm '#{tx.suggested_category}'?" } %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>
@@ -101,3 +193,34 @@
   </div>
 
 </div>
+
+<script>
+document.addEventListener("turbo:load", function() {
+  const form = document.getElementById("bulk-action-form");
+  const idsField = document.getElementById("bulk-ids-field");
+  const categoryField = document.getElementById("bulk-category-field");
+  const actionField = document.getElementById("bulk-action-field");
+
+  document.addEventListener("submit", function(e) {
+    if (e.target.id === "bulk-action-form") {
+      e.preventDefault();
+
+      const controller = window.Stimulus.controllers.find(c => c.identifier === "transaction-bulk");
+      if (controller) {
+        idsField.value = Array.from(controller.selectedIds).join(",");
+        
+        if (actionField.value === "confirm") {
+          const ids = idsField.value.split(",");
+          if (ids.length === 1) {
+            form.action = "<%= confirm_category_transaction_path(":id").gsub(':id', '') %>" + ids[0];
+          } else {
+            categoryField.value = "suggested";
+          }
+        }
+
+        form.submit();
+      }
+    }
+  });
+});
+</script>
