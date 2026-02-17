@@ -134,10 +134,11 @@
         </tr>
       </thead>
 
-      <tbody data-transaction-bulk-target="row">
+      <tbody>
         <% @transactions.each do |tx| %>
           <tr class="border-t last:border-b cursor-pointer hover:bg-gray-50"
               data-transaction-id="<%= tx.id %>"
+              data-transaction-bulk-target="row"
               data-action="click->transaction-bulk#toggleSelect">
             <td class="px-4 py-3" data-action="click->transaction-bulk#toggleSelect">
               <input type="checkbox"
