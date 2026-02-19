@@ -5,7 +5,6 @@ pkgs.mkShell {
     pkgs.ruby_3_4
     pkgs.bundler
     pkgs.nodejs
-    # pkgs.nodePackages.tailwindcss
     pkgs.yarn
     pkgs.postgresql
     pkgs.pkg-config

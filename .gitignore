@@ -6,6 +6,8 @@
 
 vendor/
 
+node_modules/
+
 .direnv/
 
 # Ignore bundler config.

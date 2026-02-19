@@ -1,10 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe 'Dashboard', type: :feature do
+  include Devise::Test::IntegrationHelpers
+
   let(:user) { create(:user) }
 
   before do
-    sign_in user
+    login_as(user, scope: :user)
+    visit authenticated_root_path
   end
 
   describe 'Dashboard Display' do
@@ -59,6 +62,27 @@ RSpec.describe 'Dashboard', type: :feature do
       expect(page).to have_content('Expenses by Category')
       expect(page).to have_content('Food')
       expect(page).to have_content('Transport')
+    end
+
+    it 'shows pie chart canvas for category breakdown' do
+      create(:transaction, user: user, amount: -200.00, date: Date.current, confirmed_category: 'Food')
+      create(:transaction, user: user, amount: -300.00, date: Date.current, confirmed_category: 'Transport')
+
+      visit authenticated_root_path
+
+      expect(page).to have_selector('canvas')
+    end
+
+    it 'pie chart data contains correct category values' do
+      create(:transaction, user: user, amount: -200.00, date: Date.current, confirmed_category: 'Food')
+      create(:transaction, user: user, amount: -300.00, date: Date.current, confirmed_category: 'Transport')
+
+      visit authenticated_root_path
+
+      chart_container = find('[data-controller="pie-chart"]')
+      data_value = chart_container['data-pie-chart-data-value']
+      expect(data_value).to include('"labels":["Food","Transport"]')
+      expect(data_value).to include('"values":["200.0","300.0"]')
     end
   end
 
@@ -127,14 +151,5 @@ RSpec.describe 'Dashboard', type: :feature do
       expect(page).to have_content('$2,000.00')
       expect(page).not_to have_content('$5,000.00')
     end
-  end
-
-  private
-
-  def sign_in(user)
-    visit new_user_session_path
-    fill_in 'Email', with: user.email
-    fill_in 'Password', with: user.password
-    click_button 'Sign in'
   end
 end
