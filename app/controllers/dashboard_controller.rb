@@ -21,9 +21,16 @@ class DashboardController < ApplicationController
                            .order(amount: :asc)
                            .limit(5)
 
-    @by_category = tx.select("coalesce(confirmed_category, suggested_category)")
-      .where("amount < 0")
-      .group("coalesce(confirmed_category, suggested_category)")
-      .sum(:amount)
+    @by_category = tx.where("amount < 0")
+      .joins("LEFT JOIN categories ON categories.id = COALESCE(transactions.category_id, transactions.suggested_category_id)")
+      .group("categories.id, categories.name")
+      .select("categories.id, categories.name, categories.color, categories.icon, SUM(transactions.amount) as total")
+      .order("total ASC")
+      .each_with_object({}) do |row, hash|
+        key = row.name || "Uncategorized"
+        hash[key] = row.total.abs
+        hash["#{key}_color"] = row.color if row.color
+        hash["#{key}_icon"] = row.icon if row.icon
+      end
   end
 end

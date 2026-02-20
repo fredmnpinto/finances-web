@@ -120,20 +120,30 @@
 
     <% if @by_category.any? %>
       <div class="flex gap-6">
-        <div class="flex-1" data-controller="pie-chart" data-pie-chart-data-value="<%= { labels: @by_category.keys, values: @by_category.values.map { |v| v.abs } }.to_json %>">
+        <div class="flex-1" data-controller="pie-chart" data-pie-chart-data-value="<%= { labels: @by_category.keys.reject { |k| k.end_with?("_color", "_icon") }, values: @by_category.select { |k, _| !k.end_with?("_color", "_icon") }.values.map { |v| v.abs } }.to_json %>">
           <div class="max-h-80 p-5">
             <canvas></canvas>
           </div>
         </div>
         <div class="flex-1">
           <ul class="space-y-2" id="category-list">
-            <% @by_category.each do |category, amount| %>
+            <% @by_category.each do |key, value| %>
+              <% next if key.end_with?("_color", "_icon") %>
+              <% category = key %>
+              <% color = @by_category["#{key}_color"] %>
+              <% icon = @by_category["#{key}_icon"] %>
               <li data-category="<%= category %>">
-                <%= link_to category,
-                transactions_path(year: @month.year, month: @month.month, category: category),
-                class: "text-gray-700 hover:text-blue-600 hover:underline text-sm" %>
+                <%= link_to transactions_path(year: @month.year, month: @month.month, category: category), class: "text-gray-700 hover:text-blue-600 hover:underline text-sm" do %>
+                  <% if color %>
+                    <span class="inline-block h-2.5 w-2.5 rounded-full mr-1 align-middle" style="background-color: <%= color %>"></span>
+                  <% end %>
+                  <% if icon.present? %>
+                    <span class="mr-1"><%= icon %></span>
+                  <% end %>
+                  <%= category %>
+                <% end %>
                 <span class="text-gray-900 font-medium text-sm float-right">
-                  <%= number_to_currency(amount.abs) %>
+                  <%= number_to_currency(value.abs) %>
                 </span>
               </li>
             <% end %>

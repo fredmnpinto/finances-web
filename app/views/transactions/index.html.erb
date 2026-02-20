@@ -39,7 +39,7 @@
           Category
         </label>
         <%= select_tag :category,
-        options_for_select(@categories, params[:category]),
+        options_for_select(@categories.map { |c| [c.name, c.name] }, params[:category]),
         include_blank: "All categories",
         class: "w-full rounded-md border-gray-300 text-sm" %>
       </div>
@@ -86,8 +86,8 @@
     <span class="text-gray-400">selected</span>
     <div class="w-px h-6 bg-gray-700"></div>
 
-    <%= select_tag "bulk_category",
-    options_for_select(@categories),
+    <%= select_tag "bulk_category_id",
+    options_for_select(@categories.map { |c| ["#{c.icon.present? ? c.icon + ' ' : ''}#{c.name}", c.id] }),
     include_blank: "Select category…",
     id: "bulk-category-select",
     class: "rounded-md border-0 bg-gray-800 text-sm text-white" %>
@@ -111,7 +111,7 @@
     <%= hidden_field_tag :month, @month.month %>
     <%= hidden_field_tag :category_confirmation_filter, @category_confirmation_filter %>
     <%= hidden_field_tag :transaction_ids, "", id: "bulk-ids-field" %>
-    <%= hidden_field_tag :category, "", id: "bulk-category-field" %>
+    <%= hidden_field_tag :category_id, "", id: "bulk-category-field" %>
     <%= hidden_field_tag :action_type, "", id: "bulk-action-field" %>
   <% end %>
 
@@ -153,16 +153,25 @@
             </td>
 
             <td class="px-4 py-3">
-              <% if tx.confirmed_category %>
-                <span class="inline-flex items-center gap-1 text-green-700">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <%= tx.confirmed_category %>
+              <% if tx.category %>
+                <span class="inline-flex items-center gap-1.5">
+                  <% if tx.category.color %>
+                    <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= tx.category.color %>"></span>
+                  <% end %>
+                  <% if tx.category.icon.present? %>
+                    <span><%= tx.category.icon %></span>
+                  <% end %>
+                  <span class="text-green-700"><%= tx.category.name %></span>
                 </span>
               <% elsif tx.suggested_category %>
-                <div class="flex items-center gap-2">
-                  <span class="text-gray-700"><%= tx.suggested_category %></span>
+                <div class="flex items-center gap-1.5">
+                  <% if tx.suggested_category.color %>
+                    <span class="h-2.5 w-2.5 rounded-full opacity-50" style="background-color: <%= tx.suggested_category.color %>"></span>
+                  <% end %>
+                  <% if tx.suggested_category.icon.present? %>
+                    <span class="opacity-50"><%= tx.suggested_category.icon %></span>
+                  <% end %>
+                  <span class="text-gray-700"><%= tx.suggested_category.name %></span>
                   <span class="text-xs text-gray-400">(suggested)</span>
                 </div>
               <% else %>
@@ -179,12 +188,12 @@
             </td>
 
             <td class="px-4 py-3">
-              <% unless tx.confirmed_category || tx.suggested_category.nil? %>
+              <% unless tx.category || tx.suggested_category.nil? %>
                 <%= button_to "Confirm",
                 confirm_category_transaction_path(tx, return_params),
                 method: :patch,
                 class: "text-xs text-green-600 hover:text-green-800",
-                data: { confirm: "Confirm '#{tx.suggested_category}'?" } %>
+                data: { confirm: "Confirm '#{tx.suggested_category.name}'?" } %>
               <% end %>
             </td>
           </tr>

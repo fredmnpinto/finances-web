@@ -5,6 +5,15 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :lockable
 
   has_many :transactions, dependent: :destroy
+  has_many :categories, dependent: :destroy
+
+  after_create :seed_categories
+
+  private
+
+  def seed_categories
+    CategorySeeder.call(self)
+  end
 
   # Add profile fields for better UX
   validates :first_name, presence: true

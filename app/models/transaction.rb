@@ -1,5 +1,7 @@
 class Transaction < ApplicationRecord
   belongs_to :user
+  belongs_to :category, optional: true
+  belongs_to :suggested_category, class_name: 'Category', optional: true
 
   enum :transaction_type, { expense: 0, income: 1, savings: 2 }
 
