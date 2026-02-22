@@ -1,4 +1,4 @@
-class CategoryCategorizer
+class CategoryRecommender
   RULES = [
     { category: "Salary", confidence: 1.0, keywords: ["cloudflare portugal", "salary", "ordenado"] },
     { category: "Freelance", confidence: 0.9, keywords: ["freelance", "freelancer", "upwork", "fiverr"] },

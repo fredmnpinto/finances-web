@@ -49,7 +49,7 @@ class ImportTransactions
   private
 
   def categorizer
-    @categorizer ||= CategoryCategorizer.new(@user)
+    @categorizer ||= CategoryRecommender.new(@user)
   end
 
   def parse_xls(file)
