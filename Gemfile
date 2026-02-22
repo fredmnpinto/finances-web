@@ -42,6 +42,9 @@ gem "kamal", require: false
 # Parse Excel files
 gem "roo", "~> 2.10"
 
+# CSV support for roo (Ruby 3.4+)
+gem "csv"
+
 # Ollama LLM client
 gem "ollama-ruby", "~> 0.7"
 
