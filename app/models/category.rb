@@ -1,4 +1,6 @@
 class Category < ApplicationRecord
+  enum :category_group, { needs: 0, wants: 1, savings: 2, income: 3 }, default: :needs
+
   belongs_to :user
   has_many :transactions, foreign_key: 'category_id', dependent: :nullify
   has_many :suggested_transactions, class_name: 'Transaction', foreign_key: 'suggested_category_id', dependent: :nullify

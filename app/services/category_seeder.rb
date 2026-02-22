@@ -1,14 +1,23 @@
 class CategorySeeder
   DEFAULT_CATEGORIES = [
-    { name: 'Food', icon: '🍕' },
-    { name: 'Transport', icon: '🚗' },
-    { name: 'Housing', icon: '🏠' },
-    { name: 'Entertainment', icon: '🎬' },
-    { name: 'Shopping', icon: '🛒' },
-    { name: 'Utilities', icon: '💡' },
-    { name: 'Health', icon: '🏥' },
-    { name: 'Income', icon: '💰' },
-    { name: 'Savings', icon: '💎' }
+    { name: "Salary", group: :income },
+    { name: "Freelance", group: :income },
+    { name: "Investments", group: :income },
+    { name: "Refunds", group: :income },
+    { name: "Other Income", group: :income },
+    { name: "Housing", group: :needs },
+    { name: "Food", group: :needs },
+    { name: "Transport", group: :needs },
+    { name: "Utilities", group: :needs },
+    { name: "Health", group: :needs },
+    { name: "Insurance", group: :needs },
+    { name: "Entertainment", group: :wants },
+    { name: "Shopping", group: :wants },
+    { name: "Self-care", group: :wants },
+    { name: "Subscriptions", group: :wants },
+    { name: "Savings", group: :savings },
+    { name: "Other Savings", group: :savings },
+    { name: "Other Expenses", group: :needs },
   ].freeze
 
   def self.call(user)
@@ -22,7 +31,7 @@ class CategorySeeder
   def call
     DEFAULT_CATEGORIES.each do |attrs|
       @user.categories.find_or_create_by!(name: attrs[:name]) do |category|
-        category.icon = attrs[:icon]
+        category.category_group = attrs[:group]
       end
     end
   end
