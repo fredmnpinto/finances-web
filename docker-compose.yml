@@ -28,7 +28,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: base
     ports:
       - "3000:3000"
     environment:
@@ -45,13 +44,6 @@ services:
     volumes:
       - .:/rails
       - bundle_cache:/bundle
-    command: >
-      sh -c "
-        npm install &&
-        bundle install &&
-        bundle exec rails tailwindcss:build &&
-        bundle exec rails server -b 0.0.0.0
-      "
 
 volumes:
   postgres_data:
