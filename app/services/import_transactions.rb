@@ -4,7 +4,7 @@ class ImportTransactions
     "Data Valor" => :value_date,
     "Descrição do Movimento" => :description,
     "Valor em EUR" => :amount,
-    "Saldo em EUR" => :balance,
+    "Saldo em EUR" => :balance
   }.freeze
 
   def initialize(user)
@@ -35,8 +35,6 @@ class ImportTransactions
         )
 
         transaction.suggested_category = result[:category]
-        transaction.category_confidence = result[:confidence]
-        transaction.category_source = result[:source]
 
         transaction.save!
         imported_count += 1
@@ -53,11 +51,12 @@ class ImportTransactions
   end
 
   def parse_xls(file)
-    spreadsheet = Roo::Spreadsheet.open(file.path)
+    spreadsheet = Roo::Spreadsheet.open(file.path, extension: :xlsx)
     sheet = spreadsheet.sheet(0)
 
-    headers = sheet.row(12).map { |h| COLUMN_MAP[h] || h }
-    data_rows = sheet.rows[13..-1]
+    header_row = find_header_row(sheet)
+    headers = sheet.row(header_row).map { |h| COLUMN_MAP[h] || h }
+    data_rows = ((header_row + 1)..sheet.last_row).map { |i| sheet.row(i) }
 
     data_rows.filter_map do |row|
       next if row.compact.empty?
@@ -70,6 +69,15 @@ class ImportTransactions
 
       hash
     end
+  end
+
+  def find_header_row(sheet)
+    COLUMN_MAP.keys.each do |header|
+      (sheet.first_row..sheet.last_row).each do |row|
+        return row if sheet.row(row).include?(header)
+      end
+    end
+    1
   end
 
   def parse_date(value)

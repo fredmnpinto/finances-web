@@ -11,6 +11,7 @@ class ImportsController < ApplicationController
     end
 
     unless valid_file?(file)
+      Rails.logger.error "Invalid file format"
       redirect_to new_import_path, alert: "Invalid file format. Please upload an XLS file."
       return
     end
@@ -23,17 +24,17 @@ class ImportsController < ApplicationController
       redirect_to new_import_path, alert: "No new transactions were imported. They may already exist."
     end
   rescue => e
-    Rails.logger.error "Import error: #{e.message}"
-    redirect_to new_import_path, alert: "Error importing file: #{e.message}"
+    Rails.logger.error "Error importing file: #{e.full_message}"
+    redirect_to new_import_path, alert: "Error importing file: #{e}"
   end
 
   private
 
   def import_params
-    params.require(:import).permit(:file)
+    params.permit(:file)
   end
 
   def valid_file?(file)
-    [".xls", ".xlsx"].include?(File.extname(file.original_filename).downcase)
+    [ ".xls", ".xlsx" ].include?(File.extname(file.original_filename).downcase)
   end
 end
