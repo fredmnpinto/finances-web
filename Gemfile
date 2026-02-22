@@ -39,6 +39,12 @@ gem "bootsnap", require: false
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem "kamal", require: false
 
+# Parse Excel files
+gem "roo", "~> 2.10"
+
+# Ollama LLM client
+gem "ollama-ruby", "~> 0.7"
+
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
