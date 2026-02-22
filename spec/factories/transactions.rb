@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :category do
     name { Faker::Lorem.word }
     color { Category::COLORS.sample }
-    icon { %w[🍕 🚗 🏠 🎬 🛒 💡 🏥 💰 💎].sample }
+    category_group { Category.category_groups.keys.sample }
     
     association :user
   end
