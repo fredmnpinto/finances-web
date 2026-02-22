@@ -1,0 +1,43 @@
+<% content_for :title, "Import Transactions" %>
+
+<div class="max-w-xl mx-auto py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-semibold text-gray-900">Import Transactions</h1>
+    <p class="mt-2 text-sm text-gray-600">
+      Upload your bank statement in XLS format to automatically import and categorize transactions.
+    </p>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-6">
+    <%= form_with url: imports_path, local: true, html: { multipart: true } do |f| %>
+      <div class="mb-6">
+        <%= f.label :file, "Select XLS File", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.file_field :file, 
+              accept: ".xls,.xlsx", 
+              class: "block w-full text-sm text-gray-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:text-sm file:font-semibold
+                file:bg-blue-50 file:text-blue-700
+                hover:file:bg-blue-100" %>
+        <p class="mt-2 text-xs text-gray-500">Supported formats: .xls, .xlsx</p>
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+        <%= link_to "Back", :back, class: "text-sm text-gray-600 hover:text-gray-900" %>
+        <%= f.submit "Import", 
+              class: "bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-6 bg-gray-50 rounded-lg p-4">
+    <h3 class="text-sm font-medium text-gray-900 mb-2">What happens after import?</h3>
+    <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
+      <li>Transactions are checked for duplicates (by date, description, and amount)</li>
+      <li>Each transaction is categorized automatically using keyword rules</li>
+      <li>Transactions that can't be categorized are sent to the LLM for suggestion</li>
+      <li>You can review and confirm suggested categories on the Transactions page</li>
+    </ul>
+  </div>
+</div>

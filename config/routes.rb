@@ -28,6 +28,10 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :imports, only: [:new, :create]
+  get "manual-transaction", to: "manual_transactions#new"
+  resources :manual_transactions, only: [:create]
+
   resources :categories do
     collection do
       get :options
