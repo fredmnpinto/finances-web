@@ -103,6 +103,9 @@ group :test do
   gem "simplecov", "~> 0.21"
 
   gem "rails-controller-testing"
+
+  # JUnit formatter for CI
+  gem "rspec_junit_formatter"
 end
 
 group :development do
