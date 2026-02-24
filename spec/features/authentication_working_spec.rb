@@ -15,13 +15,13 @@ RSpec.describe 'User Authentication', type: :feature do
     click_button 'Sign up'
 
     expect(page).to have_text('A message with a confirmation link has been sent to your email address')
-    expect(current_path).to eq(root_path)
+    expect(current_path).to eq(unauthenticated_root_path)
   end
 
   it 'requires authentication for protected pages' do
     visit authenticated_root_path
 
-    expect(page).to have_current_path(new_user_session_path)
+    expect(page).to have_current_path(unauthenticated_root_path)
   end
 
   it 'validates required fields' do

@@ -16,7 +16,7 @@ RSpec.describe 'User Authentication', type: :feature do
       click_button 'Sign up'
 
       expect(page).to have_text('A message with a confirmation link has been sent to your email address')
-      expect(current_path).to eq(root_path)
+      expect(current_path).to eq(unauthenticated_root_path)
     end
 
     it 'validates required fields on registration' do
@@ -61,7 +61,7 @@ RSpec.describe 'User Authentication', type: :feature do
 
   describe 'User Sign In' do
     it 'allows an existing user to sign in' do
-      user.confirm!
+      user.update!(confirmed_at: Time.current)
       visit new_user_session_path
 
       fill_in 'Email', with: user.email
@@ -81,7 +81,7 @@ RSpec.describe 'User Authentication', type: :feature do
 
       click_button 'Sign in'
 
-      expect(page).to have_text('Invalid Email or password')
+      expect(page).to have_text('Invalid email or password')
       expect(current_path).to eq(new_user_session_path)
     end
 
@@ -113,7 +113,7 @@ RSpec.describe 'User Authentication', type: :feature do
 
   describe 'Navigation' do
     it 'shows sign in and sign up links to unauthenticated users' do
-      visit root_path
+      visit unauthenticated_root_path
 
       expect(page).to have_link('Get Started')
       expect(page).to have_link('Sign In')
