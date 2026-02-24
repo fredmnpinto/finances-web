@@ -78,7 +78,7 @@ RSpec.describe 'Dashboard API', type: :request do
         transaction1 = create(:transaction, user: user, description: 'Groceries')
         transaction2 = create(:transaction, user: user, description: 'Gas')
 
-        get transactions_path
+        get transactions_path(category_confirmation_filter: 'all')
 
         transactions = assigns(:transactions)
         expect(transactions).to include(transaction1, transaction2)
@@ -88,7 +88,7 @@ RSpec.describe 'Dashboard API', type: :request do
         create(:transaction, :income, user: user, amount: 2000.00)
         create(:transaction, user: user, amount: -500.00)
 
-        get transactions_path(type: 'expenses')
+        get transactions_path(type: 'expenses', category_confirmation_filter: 'all')
 
         transactions = assigns(:transactions)
         expect(transactions.count).to eq(1)
@@ -99,7 +99,7 @@ RSpec.describe 'Dashboard API', type: :request do
         create(:transaction, user: user, description: 'Whole Foods Market')
         create(:transaction, user: user, description: 'Shell Gas Station')
 
-        get transactions_path(q: 'Whole')
+        get transactions_path(q: 'Whole', category_confirmation_filter: 'all')
 
         transactions = assigns(:transactions)
         expect(transactions.count).to eq(1)
@@ -107,15 +107,16 @@ RSpec.describe 'Dashboard API', type: :request do
       end
 
       it 'filters by category' do
-        create(:transaction, user: user, confirmed_category: 'Food')
-        create(:transaction, user: user, confirmed_category: 'Transport')
+        food_category = create(:category, user: user, name: "Food #{SecureRandom.hex(4)}")
+        create(:transaction, user: user, category: food_category)
+        create(:transaction, user: user, category: create(:category, user: user, name: "Transport #{SecureRandom.hex(4)}"))
 
-        get transactions_path(category: 'Food')
+        get transactions_path(category: food_category.name, category_confirmation_filter: 'all')
 
         transactions = assigns(:transactions)
 
         expect(transactions.count).to eq(1)
-        expect(transactions.first.confirmed_category).to eq('Food')
+        expect(transactions.first.category.name).to eq(food_category.name)
       end
     end
 
