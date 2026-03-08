@@ -32,7 +32,6 @@ services:
       - "3000:3000"
     environment:
       RAILS_ENV: production
-      BUNDLE_PATH: /bundle
       DATABASE_URL: postgres://admin:adminpass@db:5432/finances
       SECRET_KEY_BASE: test_secret_key_base_for_development_123456789
       NODE_ENV: production
@@ -41,10 +40,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - bundle_cache:/bundle
 
 volumes:
   postgres_data:
-  bundle_cache:
   ollama_data:
