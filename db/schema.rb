@@ -26,16 +26,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_19_100001) do
     t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
-  create_table "transactions", id: :serial, force: :cascade do |t|
+  create_table "transactions", force: :cascade do |t|
     t.decimal "amount", null: false
     t.decimal "balance"
     t.bigint "category_id"
-    t.datetime "created_at", precision: nil, default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "created_at", null: false
     t.date "date", null: false
     t.text "description", null: false
     t.text "source_file"
     t.bigint "suggested_category_id"
     t.integer "transaction_type"
+    t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.date "value_date"
     t.index ["category_id"], name: "index_transactions_on_category_id"
@@ -70,5 +71,4 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_19_100001) do
   add_foreign_key "categories", "users"
   add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "categories", column: "suggested_category_id"
-  add_foreign_key "transactions", "users"
 end
