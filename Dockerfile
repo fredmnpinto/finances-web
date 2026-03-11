@@ -1,71 +1,46 @@
+# Dockerfile for deploying the Nix-built finances-web package
+# Build: docker build -t finances-web .
+# Run:   docker run -d -p 3000:3000 -e RAILS_MASTER_KEY=<key> -e DATABASE_URL=<url> finances-web
 
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t the_life_planner .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name the_life_planner the_life_planner
+# Build stage - builds the Nix package
+FROM nixos/nix:latest AS builder
 
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
-
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=3.4.1
-FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
-
-# Rails app lives here
-WORKDIR /rails
-
-# Install base packages
-RUN apt-get update -qq && \
-  apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
-  rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Set production environment
-ENV RAILS_ENV="development" \
-  BUNDLE_DEPLOYMENT="1" \
-  BUNDLE_PATH="/usr/local/bundle" \
-  #  BUNDLE_WITHOUT="development" \
-  SECRET_KEY_BASE_DUMMY="1"
-
-# Throw-away build stage to reduce size of final image
-FROM base AS build
-
-# Install packages needed to build gems
-RUN apt-get update -qq && \
-  apt-get install --no-install-recommends -y build-essential git libpq-dev pkg-config && \
-  rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Install application gems
-COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
-  rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
-  bundle exec bootsnap precompile --gemfile
-
-# Copy application code
+WORKDIR /app
 COPY . .
 
-# Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
+# Build the package (output goes to result/)
+RUN nix --extra-experimental-features "nix-command flakes" build .#default
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN ./bin/rails assets:precompile
+# Runtime stage - minimal image with runtime deps
+FROM debian:bookworm-slim
 
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libjemalloc2 \
+        libvips42 \
+        postgresql-client \
+        ca-certificates \
+        curl \
+    && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
+# Copy nix store (this is large but includes all deps)
+COPY --from=builder /nix/store /nix/store
 
+# Copy built application
+COPY --from=builder /app/result /app
 
-# Final stage for app image
-FROM base
+WORKDIR /app
 
-# Copy built artifacts: gems, application
-COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --from=build /rails /rails
+# Environment
+ENV HOME=/app \
+    BUNDLE_GEMFILE=/app/Gemfile \
+    BUNDLE_PATH=/app/gems \
+    PATH=/app/bin:/app/gems/bin:/nix/var/nix/profiles/default/bin:/nix/store/*-bash-*/bin:/nix/store/*-coreutils-*/bin:$PATH \
+    LD_LIBRARY_PATH=/nix/store/*-glibc-*/lib:/nix/store/*-vips-*/lib:$LD_LIBRARY_PATH \
+    LOCALE_ARCHIVE=/nix/store/*-glibc-*/lib/locale/locale-archive \
+    RAILS_ENV=production
 
-# Run and own only the runtime files as a non-root user for security
-RUN groupadd --system --gid 1000 rails && \
-  useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-  chown -R rails:rails db log storage tmp
-USER 1000:1000
-
-# Entrypoint prepares the database.
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
-
-# Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD ["./bin/rails", "server"]
+
+CMD ["/app/bin/finances-web"]
