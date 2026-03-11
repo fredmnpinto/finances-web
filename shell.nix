@@ -1,18 +1,19 @@
 { pkgs ? import <nixpkgs> { } }:
 
 pkgs.mkShell {
-  buildInputs = [
-    pkgs.ruby_3_4
-    pkgs.bundler
-    pkgs.nodejs
-    pkgs.nodePackages.tailwindcss
-    pkgs.yarn
-    pkgs.postgresql
-    pkgs.pkg-config
-    pkgs.git
-    pkgs.zlib
-    pkgs.openssl
-    pkgs.libyaml
+  buildInputs = with pkgs; [
+    ruby_3_4
+    bundler
+    nodejs
+    nodePackages.tailwindcss
+    yarn
+    postgresql
+    pkg-config
+    git
+    zlib
+    openssl
+    libyaml
+    bundix
   ];
 
   shellHook = ''
