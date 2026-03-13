@@ -75,14 +75,14 @@ pkgs.stdenv.mkDerivation {
     # Create wrapper script for nix run
     mkdir -p $out/bin
     cat > $out/bin/finances-web << 'WRAPPER'
-    #!/bin/sh
-    if [ -z "$HOME" ]; then HOME=/tmp; fi
-    export HOME
-    export BUNDLE_GEMFILE="DIR/Gemfile"
-    export BUNDLE_PATH="DIR/gems"
-    exec "DIR/gems/bin/bundle" exec rails server -p 3000 -b 0.0.0.0 "$@"
-    WRAPPER
-    sed -i "s|DIR|$out|g" $out/bin/finances-web
+#!/bin/sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -z "$HOME" ]; then HOME=/tmp; fi
+export HOME
+export BUNDLE_GEMFILE="$SCRIPT_DIR/../Gemfile"
+export BUNDLE_PATH="$SCRIPT_DIR/../gems"
+exec "$SCRIPT_DIR/../gems/bin/bundle" exec rails server -p 3000 -b 0.0.0.0 "$@"
+WRAPPER
     chmod +x $out/bin/finances-web
 
     runHook postInstall

@@ -8,10 +8,51 @@
   outputs = { self, nixpkgs }:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs { system = "x86_64-linux"; };
+      pkgs = import nixpkgs { 
+        system = "x86_64-linux";
+        config.allowUnfree = true;
+      };
+      app = pkgs.callPackage ./finances-web.nix { };
     in
     {
-      packages.${system}.default = pkgs.callPackage ./finances-web.nix { };
+      packages.${system} = {
+        default = app;
+        docker-image = pkgs.dockerTools.buildImage {
+          name = "finances-web";
+          tag = "latest";
+
+          copyToRoot = pkgs.symlinkJoin {
+            name = "finances-web-root";
+            paths = [
+              (pkgs.buildEnv {
+                name = "binlibs";
+              paths = [
+                pkgs.bash
+                pkgs.jemalloc
+                pkgs.vips
+                pkgs.postgresql
+                pkgs.cacert
+                pkgs.curl
+                pkgs.coreutils
+              ];
+                pathsToLink = [ "/bin" "/lib" ];
+              })
+              app
+            ];
+          };
+
+          config = {
+            Env = [
+              "HOME=/app"
+              "BUNDLE_GEMFILE=/app/Gemfile"
+              "BUNDLE_PATH=/app/gems"
+              "RAILS_ENV=production"
+            ];
+            Expose = [ 3000 ];
+            Cmd = [ "/bin/finances-web" ];
+          };
+        };
+      };
 
       devShells.${system}.default = import ./shell.nix { inherit pkgs; };
       runScript = "zsh";
