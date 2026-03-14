@@ -1,13 +1,13 @@
 pipeline:
   test:
-    image: nix:latest
+    image: nixos/nix:latest
     commands:
       - nix develop -c bundle exec rspec
     when:
       - event: [push, pull_request]
 
   build:
-    image: nix:latest
+    image: nixos/nix:latest
     commands:
       - nix build .#docker-image
       - docker load < result
