@@ -1,9 +1,14 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-require 'spec_helper'
+require 'rails_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
+
+# Ensure email delivery uses :test method in test environment
+ActionMailer::Base.delivery_method = :test
+ActionMailer::Base.perform_deliveries = true
+
 require 'rspec/rails'
 require 'faker'
 require 'factory_bot_rails'
