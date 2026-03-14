@@ -1,14 +1,10 @@
 pipeline:
-  test:
+  build-and-test:
     image: nixos/nix:latest
+    environment:
+      NIX_CONFIG: "experimental-features = nix-command flakes"
     commands:
       - nix develop -c bundle exec rspec
-    when:
-      - event: [push, pull_request]
-
-  build:
-    image: nixos/nix:latest
-    commands:
       - nix build .#docker-image
       - docker load < result
       - docker tag finances-web:latest nixserver:5000/finances-web:latest
