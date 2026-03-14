@@ -19,8 +19,7 @@ steps:
       NIX_CONFIG: "experimental-features = nix-command flakes"
       TZ: "UTC"
     commands:
-      - nix store delete /nix/store/*-gemset.nix* /nix/store/*-gemfile-and-lockfile.drv* /nix/store/*-ffi*.drv* 2>/dev/null || true
-      - nix build .#docker-image
+      - nix build .#docker-image --refresh
       - docker load < result
       - docker tag finances-web:latest nixserver:5000/finances-web:latest
       - docker push nixserver:5000/finances-web:latest
