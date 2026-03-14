@@ -1,5 +1,9 @@
 source "https://rubygems.org"
 
+# Force bundler to resolve gems without platform-specific variants
+# This prevents issues with Nix builds
+ENV["BUNDLE_FORCE_RUBY_PLATFORM"] = "1"
+
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.1.2"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]

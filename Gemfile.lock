@@ -239,7 +239,7 @@ GEM
       net-protocol
     net-ssh (7.3.0)
     nio4r (2.7.5)
-    nokogiri (1.19.0-x86_64-linux-gnu)
+    nokogiri (1.19.0)
       racc (~> 1.4)
     ollama-ruby (0.16.0)
       excon (~> 1.0)
@@ -255,7 +255,7 @@ GEM
     parser (3.3.10.1)
       ast (~> 2.4.1)
       racc
-    pg (1.6.3-x86_64-linux)
+    pg (1.6.3)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
