@@ -5,7 +5,7 @@ FactoryBot.define do
     name { Faker::Lorem.word }
     color { Category::COLORS.sample }
     category_group { Category.category_groups.keys.sample }
-    
+
     association :user
   end
 

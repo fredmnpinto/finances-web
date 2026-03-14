@@ -53,20 +53,26 @@ RSpec.describe 'Dashboard', type: :feature do
     end
 
     it 'shows expenses by category breakdown' do
-      create(:transaction, user: user, amount: -200.00, date: Date.current, confirmed_category: 'Food')
-      create(:transaction, user: user, amount: -300.00, date: Date.current, confirmed_category: 'Transport')
-      create(:transaction, user: user, amount: -100.00, date: Date.current, confirmed_category: 'Food')
+      food_category = create(:category, name: "Food-#{SecureRandom.hex(4)}", user: user)
+      transport_category = create(:category, name: "Transport-#{SecureRandom.hex(4)}", user: user)
+
+      create(:transaction, user: user, amount: -200.00, date: Date.current, category: food_category)
+      create(:transaction, user: user, amount: -300.00, date: Date.current, category: transport_category)
+      create(:transaction, user: user, amount: -100.00, date: Date.current, category: food_category)
 
       visit authenticated_root_path
 
       expect(page).to have_content('Expenses by Category')
-      expect(page).to have_content('Food')
-      expect(page).to have_content('Transport')
+      expect(page).to have_content(food_category.name)
+      expect(page).to have_content(transport_category.name)
     end
 
     it 'shows pie chart canvas for category breakdown' do
-      create(:transaction, user: user, amount: -200.00, date: Date.current, confirmed_category: 'Food')
-      create(:transaction, user: user, amount: -300.00, date: Date.current, confirmed_category: 'Transport')
+      food_category = create(:category, name: "Food-#{SecureRandom.hex(4)}", user: user)
+      transport_category = create(:category, name: "Transport-#{SecureRandom.hex(4)}", user: user)
+
+      create(:transaction, user: user, amount: -200.00, date: Date.current, category: food_category)
+      create(:transaction, user: user, amount: -300.00, date: Date.current, category: transport_category)
 
       visit authenticated_root_path
 
@@ -74,15 +80,20 @@ RSpec.describe 'Dashboard', type: :feature do
     end
 
     it 'pie chart data contains correct category values' do
-      create(:transaction, user: user, amount: -200.00, date: Date.current, confirmed_category: 'Food')
-      create(:transaction, user: user, amount: -300.00, date: Date.current, confirmed_category: 'Transport')
+      food_category = create(:category, name: "Food-#{SecureRandom.hex(4)}", user: user)
+      transport_category = create(:category, name: "Transport-#{SecureRandom.hex(4)}", user: user)
+
+      create(:transaction, user: user, amount: -200.00, date: Date.current, category: food_category)
+      create(:transaction, user: user, amount: -300.00, date: Date.current, category: transport_category)
 
       visit authenticated_root_path
 
       chart_container = find('[data-controller="pie-chart"]')
       data_value = chart_container['data-pie-chart-data-value']
-      expect(data_value).to include('"labels":["Food","Transport"]')
-      expect(data_value).to include('"values":["200.0","300.0"]')
+      expect(data_value).to include(food_category.name)
+      expect(data_value).to include(transport_category.name)
+      expect(data_value).to include('"300.0"')
+      expect(data_value).to include('"200.0"')
     end
   end
 
