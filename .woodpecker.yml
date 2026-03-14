@@ -1,5 +1,5 @@
 steps:
-  - name: build-and-test
+  - name: test
     image: nixos/nix:latest
     environment:
       NIX_CONFIG: "experimental-features = nix-command flakes"
@@ -10,6 +10,15 @@ steps:
       - nix develop -c bundle exec rake assets:precompile RAILS_ENV=test
       - nix develop -c bundle exec rake db:create db:migrate RAILS_ENV=test
       - nix develop -c bundle exec rspec
+    when:
+      - event: push
+
+  - name: build-and-push
+    image: nixos/nix:latest
+    environment:
+      NIX_CONFIG: "experimental-features = nix-command flakes"
+      TZ: "UTC"
+    commands:
       - nix build .#docker-image
       - docker load < result
       - docker tag finances-web:latest nixserver:5000/finances-web:latest
