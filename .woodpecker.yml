@@ -1,5 +1,5 @@
-pipeline:
-  build-and-test:
+steps:
+  - name: build-and-test
     image: nixos/nix:latest
     environment:
       NIX_CONFIG: "experimental-features = nix-command flakes"
