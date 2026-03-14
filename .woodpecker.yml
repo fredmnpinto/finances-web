@@ -12,13 +12,14 @@ steps:
       - docker load < result
       - docker tag finances-web:latest nixserver:5000/finances-web:latest
       - docker push nixserver:5000/finances-web:latest
-    services:
-      - name: postgres
-        image: postgres:16
-        environment:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: adminpass
-          POSTGRES_DB: finances_web_test
     when:
       - event: push
         branch: main
+
+services:
+  - name: postgres
+    image: postgres:16
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpass
+      POSTGRES_DB: finances_web_test
