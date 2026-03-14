@@ -3,6 +3,7 @@ pipeline:
     image: nixos/nix:latest
     environment:
       NIX_CONFIG: "experimental-features = nix-command flakes"
+      TZ: "UTC"
     commands:
       - nix develop -c bundle exec rspec
       - nix build .#docker-image
