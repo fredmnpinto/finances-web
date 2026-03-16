@@ -6,6 +6,9 @@ let
     ruby = pkgs.ruby_3_4;
     gemdir = ./.;
     gemConfig = pkgs.defaultGemConfig // {
+      mini_portile2 = attrs: {
+        buildInputs = [ pkgs.libxml2 pkgs.libxslt pkgs.zlib ];
+      };
       nokogiri = attrs: {
         buildInputs = [ pkgs.libxml2 pkgs.libxslt pkgs.zlib ];
       };

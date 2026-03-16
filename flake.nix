@@ -26,15 +26,15 @@
             paths = [
               (pkgs.buildEnv {
                 name = "binlibs";
-              paths = [
-                pkgs.bash
-                pkgs.jemalloc
-                pkgs.vips
-                pkgs.postgresql
-                pkgs.cacert
-                pkgs.curl
-                pkgs.coreutils
-              ];
+                paths = [
+                  pkgs.bash
+                  pkgs.jemalloc
+                  pkgs.vips
+                  pkgs.postgresql
+                  pkgs.cacert
+                  pkgs.curl
+                  pkgs.coreutils
+                ];
                 pathsToLink = [ "/bin" "/lib" ];
               })
               app
