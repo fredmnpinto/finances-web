@@ -1,28 +1,42 @@
 steps:
-  - name: test
+  - name: build
     image: nixos/nix:latest
     environment:
       NIX_CONFIG: "experimental-features = nix-command flakes"
+      TZ: "UTC"
+    commands:
+      - nix build .#docker-image --rebuild
+      - docker load < result
+    when:
+      - event: push
+
+  - name: test
+    image: finances-web:latest
+    environment:
       TZ: "UTC"
       RAILS_ENV: test
       DATABASE_URL: postgres://admin:adminpass@postgres:5432/finances_web_test
     commands:
-      - nix develop -c bundle exec rake assets:precompile RAILS_ENV=test
-      - nix develop -c bundle exec rake db:create db:migrate RAILS_ENV=test
-      - nix develop -c bundle exec rspec
+      - bundle exec rake assets:precompile
+      - bundle exec rake db:create db:migrate
+      - bundle exec rspec
+    depends_on:
+      - build
     when:
       - event: push
 
-  - name: build-and-push
+  - name: push
     image: nixos/nix:latest
     environment:
       NIX_CONFIG: "experimental-features = nix-command flakes"
       TZ: "UTC"
+      RAILS_ENV: production
     commands:
-      - nix build .#docker-image
-      - docker load < result
       - docker tag finances-web:latest nixserver:5000/finances-web:latest
       - docker push nixserver:5000/finances-web:latest
+    depends_on:
+      - build
+      - test
     when:
       - event: push
         branch: main

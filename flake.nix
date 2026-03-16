@@ -46,7 +46,6 @@
               "HOME=/app"
               "BUNDLE_GEMFILE=/app/Gemfile"
               "BUNDLE_PATH=/app/gems"
-              "RAILS_ENV=production"
             ];
             Expose = [ 3000 ];
             Cmd = [ "/bin/finances-web" ];
