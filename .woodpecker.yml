@@ -19,7 +19,7 @@ steps:
       NIX_CONFIG: "experimental-features = nix-command flakes"
       TZ: "UTC"
     commands:
-      - nix build .#docker-image --refresh
+      - nix build .#docker-image --rebuild
       - docker load < result
       - docker tag finances-web:latest nixserver:5000/finances-web:latest
       - docker push nixserver:5000/finances-web:latest
