@@ -250,14 +250,16 @@ GEM
     nokogiri (1.19.1)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    ollama-ruby (0.16.0)
+    ollama-ruby (1.19.2)
       excon (~> 1.0)
       infobar (~> 0.8)
       json (~> 2.0)
       kramdown-ansi (~> 0.0, >= 0.0.1)
+      nokogiri (~> 1.0)
       ostruct (~> 0.0)
       term-ansicolor (~> 1.11)
-      tins (~> 1.34)
+      terminal-table (~> 3.0)
+      tins (~> 1)
     orm_adapter (0.5.0)
     ostruct (0.6.3)
     parallel (1.27.0)
@@ -507,7 +509,7 @@ DEPENDENCIES
   kamal
   letter_opener (~> 1.8)
   mini_portile2
-  ollama-ruby (~> 0.7)
+  ollama-ruby (~> 1.19)
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)

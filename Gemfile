@@ -52,7 +52,7 @@ gem "roo", "~> 2.10"
 gem "csv"
 
 # Ollama LLM client
-gem "ollama-ruby", "~> 0.7"
+gem "ollama-ruby", "~> 1.19"
 
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
