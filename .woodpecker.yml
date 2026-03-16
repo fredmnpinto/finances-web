@@ -5,7 +5,7 @@ steps:
       NIX_CONFIG: "experimental-features = nix-command flakes"
       TZ: "UTC"
     commands:
-      - nix build .#docker-image --repair
+      - nix build .#docker-image
       - docker load < result
     when:
       - event: push
