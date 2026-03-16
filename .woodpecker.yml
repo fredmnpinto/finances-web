@@ -27,12 +27,10 @@ steps:
       - event: push
 
   - name: push
-    image: nixos/nix:latest
+    image: docker:24-cli
     environment:
-      NIX_CONFIG: "experimental-features = nix-command flakes"
-      TZ: "UTC"
-      RAILS_ENV: production
       DOCKER_HOST: tcp://docker:2375
+      TZ: "UTC"
     commands:
       - docker tag finances-web:latest nixserver:5000/finances-web:latest
       - docker push nixserver:5000/finances-web:latest
