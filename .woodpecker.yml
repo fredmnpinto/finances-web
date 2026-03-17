@@ -4,7 +4,8 @@ steps:
     environment:
       NIX_CONFIG: "experimental-features = nix-command flakes"
       TZ: "UTC"
-      DOCKER_HOST: tcp://docker:2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - nix build .#docker-image
       - docker load < result
@@ -30,7 +31,8 @@ steps:
     image: docker:24-cli
     environment:
       TZ: "UTC"
-      DOCKER_HOST: tcp://docker:2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - docker tag finances-web:latest nixserver:5000/finances-web:latest
       - docker push nixserver:5000/finances-web:latest
@@ -42,10 +44,6 @@ steps:
         branch: main
 
 services:
-  - name: docker
-    image: docker:24-dind
-    privileged: true
-
   - name: postgres
     image: postgres:16
     environment:
