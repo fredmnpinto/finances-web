@@ -38,15 +38,15 @@ steps:
       DOCKER_TLS_VERIFY: "1"
       DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
     commands:
-      - docker tag finances-web:latest nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
-      - docker push nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
+      - docker tag finances-web:latest registry:5000/finances-web:${CI_COMMIT_SHA:0:8}
+      - docker push registry:5000/finances-web:${CI_COMMIT_SHA:0:8}
     depends_on:
       - load-image
     when:
       - event: push
 
   - name: test
-    image: nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
+    image: registry:5000/finances-web:${CI_COMMIT_SHA:0:8}
     environment:
       TZ: "UTC"
       RAILS_ENV: test
@@ -70,8 +70,8 @@ steps:
       DOCKER_TLS_VERIFY: "1"
       DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
     commands:
-      - docker tag nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8} nixserver:5000/finances-web:latest
-      - docker push nixserver:5000/finances-web:latest
+      - docker tag registry:5000/finances-web:${CI_COMMIT_SHA:0:8} registry:5000/finances-web:latest
+      - docker push registry:5000/finances-web:latest
     depends_on:
       - test
     when:
@@ -82,7 +82,7 @@ services:
   - name: docker
     image: docker:24-dind
     privileged: true
-    command: dockerd --insecure-registry nixserver:5000
+    command: dockerd --insecure-registry registry:5000
     environment:
       DOCKER_TLS_CERTDIR: /opt/woodpeckerci/dind-certs
     volumes:
