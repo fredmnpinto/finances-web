@@ -29,7 +29,7 @@ steps:
       - build
 
   - name: test
-    image: nixserver:5000/finances-web:latest
+    image: nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
     environment:
       TZ: "UTC"
       RAILS_ENV: test
@@ -53,12 +53,30 @@ steps:
       DOCKER_TLS_VERIFY: "1"
       DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
     commands:
-      - docker tag finances-web:latest nixserver:5000/finances-web:latest
-      - docker push nixserver:5000/finances-web:latest
+      - docker tag finances-web:latest nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
+      - docker push nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
     depends_on:
       - load-image
     when:
       - event: push
+
+  - name: promote-latest
+    image: docker:24-cli
+    volumes:
+      - /opt/woodpeckerci/dind-certs:/opt/woodpeckerci/dind-certs
+    environment:
+      TZ: "UTC"
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_TLS_VERIFY: "1"
+      DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
+    commands:
+      - docker tag nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8} nixserver:5000/finances-web:latest
+      - docker push nixserver:5000/finances-web:latest
+    depends_on:
+      - test
+    when:
+      - event: push
+        branch: main
 
 services:
   - name: docker
