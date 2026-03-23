@@ -12,8 +12,6 @@ steps:
     commands:
       - nix build .#docker-image
       - docker save "$(cat result)" > image.tar
-    settings:
-      image.tar: true
     when:
       - event: push
 
@@ -25,9 +23,6 @@ steps:
       DOCKER_HOST: tcp://docker:2376
       DOCKER_TLS_VERIFY: "1"
       DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
-    settings:
-      image.tar:
-        from: build
     commands:
       - docker load --input image.tar
     depends_on:
