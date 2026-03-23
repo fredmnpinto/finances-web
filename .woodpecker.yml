@@ -29,8 +29,7 @@ steps:
       - build
 
   - name: test
-    image: finances-web:latest
-    pull_policy: never
+    image: nixserver:5000/finances-web:latest
     environment:
       TZ: "UTC"
       RAILS_ENV: test
@@ -40,8 +39,7 @@ steps:
       - bundle exec rake db:create db:migrate
       - bundle exec rspec
     depends_on:
-      - build
-      - load-image
+      - push
     when:
       - event: push
 
@@ -58,11 +56,9 @@ steps:
       - docker tag finances-web:latest nixserver:5000/finances-web:latest
       - docker push nixserver:5000/finances-web:latest
     depends_on:
-      - build
-      - test
+      - load-image
     when:
       - event: push
-        branch: main
 
 services:
   - name: docker
