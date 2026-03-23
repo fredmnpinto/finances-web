@@ -82,6 +82,7 @@ services:
   - name: docker
     image: docker:24-dind
     privileged: true
+    command: dockerd --insecure-registry nixserver:5000
     environment:
       DOCKER_TLS_CERTDIR: /opt/woodpeckerci/dind-certs
     volumes:
