@@ -28,21 +28,6 @@ steps:
     depends_on:
       - build
 
-  - name: test
-    image: nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
-    environment:
-      TZ: "UTC"
-      RAILS_ENV: test
-      DATABASE_URL: postgres://admin:adminpass@postgres:5432/finances_web_test
-    commands:
-      - bundle exec rake assets:precompile
-      - bundle exec rake db:create db:migrate
-      - bundle exec rspec
-    depends_on:
-      - push
-    when:
-      - event: push
-
   - name: push
     image: docker:24-cli
     volumes:
@@ -57,6 +42,21 @@ steps:
       - docker push nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
     depends_on:
       - load-image
+    when:
+      - event: push
+
+  - name: test
+    image: nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
+    environment:
+      TZ: "UTC"
+      RAILS_ENV: test
+      DATABASE_URL: postgres://admin:adminpass@postgres:5432/finances_web_test
+    commands:
+      - bundle exec rake assets:precompile
+      - bundle exec rake db:create db:migrate
+      - bundle exec rspec
+    depends_on:
+      - push
     when:
       - event: push
 
