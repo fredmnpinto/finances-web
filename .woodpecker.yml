@@ -40,6 +40,7 @@ steps:
       - bundle exec rspec
     depends_on:
       - build
+      - load-image
     when:
       - event: push
 
