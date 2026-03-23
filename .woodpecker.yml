@@ -11,9 +11,21 @@ steps:
       DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
     commands:
       - nix build .#docker-image
-      - docker load < result
     when:
       - event: push
+
+  - name: load-image
+    image: docker:cli
+    volumes:
+      - /opt/woodpeckerci/dind-certs:/opt/woodpeckerci/dind-certs
+    environment:
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_TLS_VERIFY: "1"
+      DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
+    commands:
+      - docker load < result
+    depends_on:
+      - build
 
   - name: test
     image: finances-web:latest
