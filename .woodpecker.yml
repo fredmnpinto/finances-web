@@ -30,6 +30,7 @@ steps:
 
   - name: test
     image: finances-web:latest
+    pull_policy: never
     environment:
       TZ: "UTC"
       RAILS_ENV: test
