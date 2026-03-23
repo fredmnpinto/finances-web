@@ -11,7 +11,7 @@ steps:
       DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
     commands:
       - nix build .#docker-image
-      - docker save "$(cat result)" > image.tar
+      - cp result image.tar
     when:
       - event: push
 
