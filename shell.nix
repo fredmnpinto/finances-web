@@ -22,10 +22,8 @@ pkgs.mkShell {
     export RAILS_ENV=development
     export TAILWINDCSS_INSTALL_DIR=${pkgs.tailwindcss}/bin
 
-    # Install gems if needed
-    if [ ! -d "vendor/bundle" ]; then
-      bundle config set --local path "vendor/bundle"
-      bundle install
-    fi
+    # Install gems
+    bundle config set --local path "vendor/bundle"
+    bundle install
   '';
 }
