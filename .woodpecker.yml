@@ -46,15 +46,14 @@ steps:
   #     - event: push
 
   - name: test
-    image: nixserver:5000/finances-web:latest
+    image: nixos/nix:latest
     environment:
+      NIX_CONFIG: "experimental-features = nix-command flakes"
       TZ: "UTC"
-      RAILS_ENV: test
       DATABASE_URL: postgres://admin:adminpass@postgres:5432/finances_web_test
+      RAILS_ENV: test
     commands:
-      - rake assets:precompile
-      - rake db:create db:migrate
-      - rspec
+      - nix develop -c bash -c "bundle exec rake assets:precompile && bundle exec rake db:create db:migrate && bundle exec rspec"
     # depends_on:
     #   - push
     when:
