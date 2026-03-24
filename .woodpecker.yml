@@ -15,6 +15,20 @@ steps:
     when:
       - event: push
 
+  - name: test
+    image: nixos/nix:latest
+    environment:
+      NIX_CONFIG: "experimental-features = nix-command flakes"
+      TZ: "UTC"
+      RAILS_ENV: test
+      DATABASE_URL: postgres://admin:adminpass@postgres:5432/finances_web_test
+    commands:
+      - nix develop -c bundle exec rake assets:precompile RAILS_ENV=test
+      - nix develop -c bundle exec rake db:create db:migrate RAILS_ENV=test
+      - nix develop -c bundle exec rspec
+    when:
+      - event: push
+
   - name: load-image
     image: docker:cli
     volumes:
@@ -42,18 +56,6 @@ steps:
       - docker push nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
     depends_on:
       - load-image
-    when:
-      - event: push
-
-  - name: test
-    image: nixos/nix:latest
-    environment:
-      NIX_CONFIG: "experimental-features = nix-command flakes"
-      TZ: "UTC"
-      DATABASE_URL: postgres://admin:adminpass@postgres:5432/finances_web_test
-      RAILS_ENV: test
-    commands:
-      - nix develop -c bash -c "bundle exec rake assets:precompile && bundle exec rake db:create db:migrate && bundle exec rspec"
     when:
       - event: push
 
