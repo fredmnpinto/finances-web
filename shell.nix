@@ -1,9 +1,34 @@
 { pkgs ? import <nixpkgs> { } }:
 
+let
+  gems = pkgs.bundlerEnv {
+    name = "finances-web-gems";
+    ruby = pkgs.ruby_3_4;
+    gemdir = ./.;
+    gemConfig = pkgs.defaultGemConfig // {
+      mini_portile2 = attrs: {
+        buildInputs = [ pkgs.libxml2 pkgs.libxslt pkgs.zlib ];
+      };
+      nokogiri = attrs: {
+        buildInputs = [ pkgs.libxml2 pkgs.libxslt pkgs.zlib ];
+      };
+      pg = attrs: {
+        buildInputs = [ pkgs.postgresql ];
+      };
+      ffi = attrs: {
+        buildInputs = [ pkgs.libffi ];
+      };
+      ruby-vips = attrs: {
+        buildInputs = [ pkgs.vips ];
+      };
+    };
+  };
+in
+
 pkgs.mkShell {
   buildInputs = with pkgs; [
+    gems
     ruby_3_4
-    bundler
     nodejs
     nodePackages.tailwindcss
     yarn
@@ -13,17 +38,12 @@ pkgs.mkShell {
     zlib
     openssl
     libyaml
-    bundix
+    libffi
+    vips
   ];
 
   shellHook = ''
-    export GEM_HOME="$(pwd)/vendor/bundle/ruby/3.4.0"
-    export PATH="$GEM_HOME/bin:$HOME/.local/share/gem/ruby/3.4.0/bin:$PATH"
     export RAILS_ENV=development
     export TAILWINDCSS_INSTALL_DIR=${pkgs.tailwindcss}/bin
-
-    # Install gems
-    bundle config set --local path "vendor/bundle"
-    bundle install
   '';
 }
