@@ -42,22 +42,6 @@ steps:
     depends_on:
       - build
 
-  - name: debug-network
-    image: docker:cli
-    volumes:
-      - /opt/woodpeckerci/dind-certs:/opt/woodpeckerci/dind-certs
-    environment:
-      DOCKER_HOST: tcp://docker:2376
-      DOCKER_TLS_VERIFY: "1"
-      DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
-    commands:
-      - docker info | grep -A 5 "Insecure Registries"
-      - docker pull alpine:latest || echo "docker pull failed"
-      - ping -c 1 nixserver || echo "nixserver not reachable"
-      - getent hosts nixserver || echo "nixserver not in hosts"
-    when:
-      - event: push
-
   - name: push
     image: docker:24-cli
     volumes:
