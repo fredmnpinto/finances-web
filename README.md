@@ -176,6 +176,22 @@ All subdomains are protected by Cloudflare Access with the following policy:
 
 Users must authenticate via the configured IdP (Google, GitHub, etc.) before accessing any subdomain.
 
+### Webhook Bypass (GitHub → Woodpecker)
+
+GitHub webhooks cannot authenticate through Cloudflare Access. To allow GitHub to trigger Woodpecker builds:
+
+1. **Create a separate Access application** for the webhook endpoint:
+   - Go to **Access** > **Applications** > **Add application**
+   - Select **Self-hosted**
+   - **Domain**: `ci.nacaratopinto.com/api/hook`
+   - (or use just `ci.nacaratopinto.com` and it will inherit)
+
+2. **Add a Bypass policy**:
+   - **Action**: Bypass
+   - **Include**: Everyone
+
+This creates a more specific application that takes precedence over the wildcard, allowing the webhook path to bypass authentication.
+
 ### Troubleshooting
 
 ```bash
