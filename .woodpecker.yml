@@ -94,6 +94,18 @@ steps:
       - event: push
         branch: main
 
+  - name: deploy
+    image: docker/compose:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/nixos:/etc/nixos
+    commands:
+      - docker-compose -f /etc/nixos/docker-compose.yml pull web
+      - docker-compose -f /etc/nixos/docker-compose.yml up -d web
+    when:
+      - event: push
+        branch: main
+
 services:
   - name: docker
     image: docker:24-dind
