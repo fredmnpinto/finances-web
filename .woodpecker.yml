@@ -102,7 +102,7 @@ services:
       DOCKER_TLS_CERTDIR: /opt/woodpeckerci/dind-certs
     volumes:
       - /opt/woodpeckerci/dind-certs:/opt/woodpeckerci/dind-certs
-      - ./daemon.json:/etc/docker/daemon.json
+      - /etc/nixos/daemon.json:/etc/docker/daemon.json
 
   - name: postgres
     image: postgres:16
