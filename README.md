@@ -122,6 +122,73 @@ docker compose exec app rails db:create db:migrate
 nix run . -- db:create db:migrate
 ```
 
+## Cloudflare Tunnel (Deployment)
+
+The application is exposed via Cloudflare Tunnel for secure public access.
+
+### Architecture
+
+- **Tunnel**: `1622d182-312f-4713-b923-cf1c1800daff`
+- **Hostnames**:
+  - `*.nacaratopinto.com` - All subdomains protected with Cloudflare Access
+
+### Adding a New Subdomain
+
+1. **Update NixOS config** on nixserver (`/etc/nixos/configuration.nix`):
+
+```nix
+services.cloudflared = {
+  enable = true;
+  tunnels = {
+    "1622d182-312f-4713-b923-cf1c1800daff" = {
+      credentialsFile = "/etc/nixos/cloudflared-tunnel-creds.json";
+      default = "http_status:404";
+      ingress = {
+        "ci.nacaratopinto.com" = "http://localhost:8000";
+        "finances.nacaratopinto.com" = "http://localhost:3000";
+        # Add new hostname here
+        "new-service.nacaratopinto.com" = "http://localhost:PORT";
+      };
+    };
+  };
+};
+```
+
+2. **Apply changes**:
+```bash
+sudo nixos-rebuild switch
+```
+
+3. **Create DNS record**:
+```bash
+cloudflared tunnel route dns 1622d182-312f-4713-b923-cf1c1800daff new-service.nacaratopinto.com
+```
+
+4. **Access is already protected** - The wildcard policy (`*.nacaratopinto.com`) applies automatically to all subdomains.
+
+### Cloudflare Access
+
+All subdomains are protected by Cloudflare Access with the following policy:
+
+- **Application**: `*.nacaratopinto.com`
+- **Action**: Allow
+- **Rule**: Include emails ending in @yourdomain.com
+
+Users must authenticate via the configured IdP (Google, GitHub, etc.) before accessing any subdomain.
+
+### Troubleshooting
+
+```bash
+# Check cloudflared status
+systemctl status cloudflared-tunnel-1622d182-312f-4713-b923-cf1c1800daff
+
+# View logs
+journalctl -u cloudflared-tunnel-1622d182-312f-4713-b923-cf1c1800daff -f
+
+# Test DNS resolution
+host new-service.nacaratopinto.com 1.1.1.1
+```
+
 ## System Dependencies
 
 If running without Docker, you'll need:
