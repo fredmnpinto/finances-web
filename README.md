@@ -172,7 +172,7 @@ All subdomains are protected by Cloudflare Access with the following policy:
 
 - **Application**: `*.nacaratopinto.com`
 - **Action**: Allow
-- **Rule**: Include emails ending in @yourdomain.com
+- **Rule**: Include specific emails - fredmnpinto@gmail.com, babinacarato@gmail.com
 
 Users must authenticate via the configured IdP (Google, GitHub, etc.) before accessing any subdomain.
 
