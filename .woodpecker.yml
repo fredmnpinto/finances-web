@@ -61,7 +61,7 @@ steps:
     commands:
       - docker-compose -f /etc/nixos/docker-compose.yml pull web
       - docker-compose -f /etc/nixos/docker-compose.yml up -d web
-      - docker-compose -f /etc/nixos/docker-compose.yml exec web /bin/finances-web rails db:prepare
+      - docker-compose -f /etc/nixos/docker-compose.yml exec -T web /bin/finances-web rails db:prepare
     depends_on:
       - push
     when:
