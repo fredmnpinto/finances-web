@@ -192,6 +192,27 @@ GitHub webhooks cannot authenticate through Cloudflare Access. To allow GitHub t
 
 This creates a more specific application that takes precedence over the wildcard, allowing the webhook path to bypass authentication.
 
+### Nixserver Deployment Workflow
+
+When making changes to services running on nixserver (like docker-compose.yml, Cloudflare tunnel config, etc.):
+
+1. **Make changes locally** - Edit files in this repository, NOT directly on nixserver
+2. **Commit and push** - Commit changes and push to GitHub
+3. **Update nixserver** - SSH into nixserver and pull changes:
+   ```bash
+   ssh nixserver
+   cd /path/to/repo
+   git pull
+   ```
+4. **Restart services** - Restart affected containers:
+   ```bash
+   docker compose -f /etc/nixos/docker-compose.yml up -d
+   # Or for nixos-rebuild:
+   sudo nixos-rebuild switch
+   ```
+
+**Why?** This ensures all infrastructure changes are version-controlled and reproducible.
+
 ### Troubleshooting
 
 ```bash
