@@ -84,6 +84,9 @@ if [ -z "$HOME" ]; then HOME=/tmp; fi
 export HOME
 export BUNDLE_GEMFILE="$SCRIPT_DIR/../Gemfile"
 export BUNDLE_PATH="$SCRIPT_DIR/../gems"
+
+"$SCRIPT_DIR/../gems/bin/bundle" exec rails db:prepare
+
 exec "$SCRIPT_DIR/../gems/bin/bundle" exec rails server -p 3000 -b 0.0.0.0 "$@"
 WRAPPER
     chmod +x $out/bin/finances-web

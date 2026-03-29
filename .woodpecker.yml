@@ -85,7 +85,6 @@ steps:
       - /etc/nixos:/etc/nixos
     commands:
       - docker-compose -f /etc/nixos/docker-compose.yml pull web
-      - docker-compose -f /etc/nixos/docker-compose.yml run --rm web rails db:prepare
       - docker-compose -f /etc/nixos/docker-compose.yml up -d web
     depends_on:
       - promote-latest
