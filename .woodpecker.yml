@@ -92,6 +92,18 @@ steps:
       - event: push
         branch: main
 
+  - name: db-prepare
+    image: docker/compose:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - docker-compose -f /etc/nixos/docker-compose.yml exec web /bin/finances-web rails db:prepare
+    depends_on:
+      - deploy
+    when:
+      - event: push
+        branch: main
+
 services:
   - name: docker
     image: docker:24-dind

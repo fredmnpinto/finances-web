@@ -48,7 +48,7 @@
               "BUNDLE_PATH=/app/gems"
             ];
             Expose = [ 3000 ];
-            Cmd = [ "/bin/finances-web" ];
+            Cmd = [ "/bin/finances-web" "rails" "server" "-p" "3000" "-b" "0.0.0.0" ];
           };
         };
       };
