@@ -29,19 +29,6 @@ steps:
     when:
       - event: push
 
-  - name: load-image
-    image: docker:cli
-    volumes:
-      - /opt/woodpeckerci/dind-certs:/opt/woodpeckerci/dind-certs
-    environment:
-      DOCKER_HOST: tcp://docker:2376
-      DOCKER_TLS_VERIFY: "1"
-      DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
-    commands:
-      - docker load --input image.tar
-    depends_on:
-      - build
-
   - name: push
     image: docker:24-cli
     volumes:
@@ -52,28 +39,13 @@ steps:
       DOCKER_TLS_VERIFY: "1"
       DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
     commands:
+      - docker load --input image.tar
       - docker tag finances-web:latest nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
       - docker push nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8}
-    depends_on:
-      - load-image
-    when:
-      - event: push
-
-  - name: promote-latest
-    image: docker:24-cli
-    volumes:
-      - /opt/woodpeckerci/dind-certs:/opt/woodpeckerci/dind-certs
-    environment:
-      TZ: "UTC"
-      DOCKER_HOST: tcp://docker:2376
-      DOCKER_TLS_VERIFY: "1"
-      DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
-    commands:
       - docker tag nixserver:5000/finances-web:${CI_COMMIT_SHA:0:8} nixserver:5000/finances-web:latest
       - docker push nixserver:5000/finances-web:latest
     depends_on:
       - test
-      - push
     when:
       - event: push
         branch: main
@@ -86,20 +58,9 @@ steps:
     commands:
       - docker-compose -f /etc/nixos/docker-compose.yml pull web
       - docker-compose -f /etc/nixos/docker-compose.yml up -d web
-    depends_on:
-      - promote-latest
-    when:
-      - event: push
-        branch: main
-
-  - name: db-prepare
-    image: docker/compose:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
       - docker-compose -f /etc/nixos/docker-compose.yml exec web /bin/finances-web rails db:prepare
     depends_on:
-      - deploy
+      - push
     when:
       - event: push
         branch: main
