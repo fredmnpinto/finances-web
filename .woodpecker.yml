@@ -2,6 +2,7 @@ steps:
   - name: build
     image: nixos/nix:latest
     volumes:
+      - nix-store:/nix/var/nix
       - /opt/woodpeckerci/dind-certs:/opt/woodpeckerci/dind-certs
     environment:
       NIX_CONFIG: "experimental-features = nix-command flakes"
@@ -17,6 +18,8 @@ steps:
 
   - name: test
     image: nixos/nix:latest
+    volumes:
+      - nix-store:/nix/var/nix
     environment:
       NIX_CONFIG: "experimental-features = nix-command flakes"
       TZ: "UTC"
@@ -81,3 +84,5 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: adminpass
       POSTGRES_DB: finances_web_test
+
+
