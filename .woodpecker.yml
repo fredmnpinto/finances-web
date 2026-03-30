@@ -2,11 +2,8 @@ steps:
   - name: build
     image: nixos/nix:latest
     volumes:
-      - /var/lib/woodpecker/nix-store:/nix-cache
       - /opt/woodpeckerci/dind-certs:/opt/woodpeckerci/dind-certs
     environment:
-      NIX_STORE_DIR: /nix-cache/store
-      NIX_STATE_DIR: /nix-cache/state
       NIX_CONFIG: |
         experimental-features = nix-command flakes
       TZ: "UTC"
@@ -21,11 +18,7 @@ steps:
 
   - name: test
     image: nixos/nix:latest
-    volumes:
-      - /var/lib/woodpecker/nix-store:/nix-cache
     environment:
-      NIX_STORE_DIR: /nix-cache/store
-      NIX_STATE_DIR: /nix-cache/state
       NIX_CONFIG: |
         experimental-features = nix-command flakes
       TZ: "UTC"
