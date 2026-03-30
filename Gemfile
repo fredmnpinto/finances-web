@@ -45,6 +45,10 @@ gem "bootsnap", require: false
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem "kamal", require: false
 
+# Error tracking
+gem "sentry-ruby"
+gem "sentry-rails"
+
 # Parse Excel files
 gem "roo", "~> 2.10"
 

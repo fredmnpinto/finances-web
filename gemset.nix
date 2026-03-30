@@ -1476,6 +1476,28 @@
     };
     version = "4.41.0";
   };
+  sentry-rails = {
+    dependencies = ["railties" "sentry-ruby"];
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "1r5031qb02xmwmkrrz8ald4gc35xgcgz2h089873w33l5kcd9ygb";
+      type = "gem";
+    };
+    version = "6.5.0";
+  };
+  sentry-ruby = {
+    dependencies = ["bigdecimal" "concurrent-ruby" "logger"];
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "0srsbyw11h4gkr75vv4xcws8b9a9h7ii8wf3kb6syyh1d86swmrw";
+      type = "gem";
+    };
+    version = "6.5.0";
+  };
   shoulda-matchers = {
     dependencies = ["activesupport"];
     groups = ["test"];
