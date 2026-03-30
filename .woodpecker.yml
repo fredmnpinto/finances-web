@@ -62,7 +62,6 @@ steps:
     commands:
       - docker compose pull web
       - docker compose up -d web
-      - docker compose exec -T web /bin/finances-web rails db:prepare
     depends_on:
       - push
     when:
