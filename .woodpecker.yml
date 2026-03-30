@@ -53,16 +53,16 @@ steps:
         branch: main
 
   - name: deploy
-    image: docker/compose:latest
+    image: docker:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       SENTRY_DSN:
         from_secret: SENTRY_DSN
     commands:
-      - docker-compose pull web
-      - docker-compose up -e SENTRY_DSN -d web
-      - docker-compose exec -T web /bin/finances-web rails db:prepare
+      - docker compose pull web
+      - docker compose up -d web
+      - docker compose exec -T web /bin/finances-web rails db:prepare
     depends_on:
       - push
     when:
