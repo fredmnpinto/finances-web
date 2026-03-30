@@ -56,11 +56,13 @@ steps:
     image: docker/compose:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/nixos:/etc/nixos
+    environment:
+      SENTRY_DSN:
+        from_secret: SENTRY_DSN
     commands:
-      - docker-compose -f /etc/nixos/docker-compose.yml pull web
-      - docker-compose -f /etc/nixos/docker-compose.yml up -d web
-      - docker-compose -f /etc/nixos/docker-compose.yml exec -T web /bin/finances-web rails db:prepare
+      - docker-compose pull web
+      - docker-compose up -e SENTRY_DSN -d web
+      - docker-compose exec -T web /bin/finances-web rails db:prepare
     depends_on:
       - push
     when:
