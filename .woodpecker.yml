@@ -5,9 +5,10 @@ steps:
       - /var/lib/woodpecker/nix-store:/nix-cache
       - /opt/woodpeckerci/dind-certs:/opt/woodpeckerci/dind-certs
     environment:
+      NIX_STORE_DIR: /nix-cache/store
+      NIX_STATE_DIR: /nix-cache/state
       NIX_CONFIG: |
         experimental-features = nix-command flakes
-        store-dir = /nix-cache/nix
       TZ: "UTC"
       DOCKER_HOST: tcp://docker:2376
       DOCKER_TLS_VERIFY: "1"
@@ -23,9 +24,10 @@ steps:
     volumes:
       - /var/lib/woodpecker/nix-store:/nix-cache
     environment:
+      NIX_STORE_DIR: /nix-cache/store
+      NIX_STATE_DIR: /nix-cache/state
       NIX_CONFIG: |
         experimental-features = nix-command flakes
-        store-dir = /nix-cache/nix
       TZ: "UTC"
       RAILS_ENV: test
       DATABASE_URL: postgres://admin:adminpass@postgres:5432/finances_web_test
