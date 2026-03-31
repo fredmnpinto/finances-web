@@ -61,6 +61,8 @@ steps:
         from_secret: SENTRY_DSN
       SECRET_KEY_BASE:
         from_secret: SECRET_KEY_BASE
+      RAILS_MASTER_KEY:
+        from_secret: RAILS_MASTER_KEY
     commands:
       - docker compose pull web
       - docker compose up -d web
