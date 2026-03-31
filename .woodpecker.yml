@@ -59,6 +59,8 @@ steps:
     environment:
       SENTRY_DSN:
         from_secret: SENTRY_DSN
+      SECRET_KEY_BASE:
+        from_secret: SECRET_KEY_BASE
     commands:
       - docker compose pull web
       - docker compose up -d web
