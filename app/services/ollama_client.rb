@@ -9,8 +9,12 @@ class OllamaClient
   def categorize(description:, amount:)
     prompt = build_prompt(description, amount)
 
-    response = client.generate(model: @model, prompt: prompt)
-    parse_response(response["response"])
+    result = client.generate(
+      { model: @model, prompt: prompt, stream: false }
+    )
+    # ollama-ai returns an array with the result
+    response_text = result.map { |r| r["response"] }.join
+    parse_response(response_text)
   rescue JSON::ParserError => e
     Rails.logger.error "Failed to parse Ollama response: #{e.message}"
     fallback_response
@@ -29,7 +33,10 @@ class OllamaClient
   private
 
   def client
-    @client ||= ::Ollama::Client.new(base_url: @url)
+    @client ||= ::Ollama.new(
+      credentials: { address: @url },
+      options: { server_sent_events: false }
+    )
   end
 
   def build_prompt(description, amount)

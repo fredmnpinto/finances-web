@@ -1,1 +1,1 @@
-require "ollama"
+require "ollama-ai"
