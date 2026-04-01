@@ -9,6 +9,10 @@ RSpec.describe 'Transactions', type: :feature do
     visit transactions_path(category_confirmation_filter: "all", **params)
   end
 
+  def current_month
+    Date.current
+  end
+
   before do
     login_as(user, scope: :user)
   end
@@ -22,11 +26,11 @@ RSpec.describe 'Transactions', type: :feature do
     end
 
     it 'displays user\'s transactions in chronological order' do
-      create(:transaction, :uncategorized, user: user, date: 2.days.ago, description: 'Groceries')
-      create(:transaction, :uncategorized, user: user, date: 1.day.ago, description: 'Gas')
-      create(:transaction, :uncategorized, user: user, date: 3.days.ago, description: 'Rent')
+      create(:transaction, :uncategorized, user: user, date: "2026-04-01", description: 'Rent')
+      create(:transaction, :uncategorized, user: user, date: "2026-04-02", description: 'Groceries')
+      create(:transaction, :uncategorized, user: user, date: "2026-04-03", description: 'Gas')
 
-      visit_transactions
+      visit_transactions(year: 2026, month: 4)
 
       transactions_list = page.all('table tbody tr')
       expect(transactions_list[0]).to have_content('Gas')
