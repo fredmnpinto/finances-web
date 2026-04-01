@@ -39,7 +39,8 @@ ENV HOME=/app \
     PATH=/app/bin:/app/gems/bin:/nix/var/nix/profiles/default/bin:/nix/store/*-bash-*/bin:/nix/store/*-coreutils-*/bin:$PATH \
     LD_LIBRARY_PATH=/nix/store/*-glibc-*/lib:/nix/store/*-vips-*/lib:$LD_LIBRARY_PATH \
     LOCALE_ARCHIVE=/nix/store/*-glibc-*/lib/locale/locale-archive \
-    RAILS_ENV=production
+    RAILS_ENV=production \
+    SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 EXPOSE 3000
 
