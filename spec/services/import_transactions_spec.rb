@@ -67,6 +67,14 @@ RSpec.describe ImportTransactions do
         import_service.call(file)
       end
 
+      it 'saves transaction even if categorizer fails' do
+        expect(category_recommender).to receive(:categorize).and_raise(StandardError)
+
+        expect {
+          import_service.call(file)
+        }.to change(Transaction, :count).by(2)
+      end
+
       it 'does not import transactions that already exist' do
         import_service.call(file)
         expect { import_service.call(file) }.not_to change(Transaction, :count)
