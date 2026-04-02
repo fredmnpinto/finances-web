@@ -942,6 +942,17 @@
     };
     version = "1.27.0";
   };
+  parallel_tests = {
+    dependencies = ["parallel"];
+    groups = ["test"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "0w2xfc3jrj92w78yd4413s48lkjf3mjw47x4yw8b4qhld664a1fz";
+      type = "gem";
+    };
+    version = "4.10.1";
+  };
   parser = {
     dependencies = ["ast" "racc"];
     groups = ["default" "development" "test"];

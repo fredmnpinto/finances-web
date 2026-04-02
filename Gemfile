@@ -91,6 +91,9 @@ group :test do
   # Test data factory
   gem "factory_bot_rails", "~> 6.2"
 
+  # Parallel testing
+  gem "parallel_tests", "~> 4.0"
+
   # Database cleaning between tests
   gem "database_cleaner-active_record", "~> 2.0"
 
