@@ -6,11 +6,14 @@ steps:
     environment:
       NIX_CONFIG: |
         experimental-features = nix-command flakes
+        substituters = https://cache.nixos.org https://finances-web.cachix.org
+        trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= finances-web.cachix.org-1:ReQknutCwYDgQMIvkd1WuNS1AZroZkKlPg0/D/3R4J4=
       TZ: "UTC"
       DOCKER_HOST: tcp://docker:2376
       DOCKER_TLS_VERIFY: "1"
       DOCKER_CERT_PATH: /opt/woodpeckerci/dind-certs/client
     commands:
+      - nix run nixpkgs#cachix use finances-web
       - nix build .#docker-image
       - cp result image.tar
     when:
@@ -21,10 +24,13 @@ steps:
     environment:
       NIX_CONFIG: |
         experimental-features = nix-command flakes
+        substituters = https://cache.nixos.org https://finances-web.cachix.org
+        trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= finances-web.cachix.org-1:ReQknutCwYDgQMIvkd1WuNS1AZroZkKlPg0/D/3R4J4=
       TZ: "UTC"
       RAILS_ENV: test
       DATABASE_URL: postgres://admin:adminpass@postgres:5432/finances_web_test
     commands:
+      - nix run nixpkgs#cachix use finances-web
       - nix develop -c bundle exec rake assets:precompile RAILS_ENV=test
       - nix develop -c bundle exec rake db:create db:migrate RAILS_ENV=test
       - nix develop -c bundle exec parallel_rspec
