@@ -6,7 +6,10 @@ class ManualTransactionsController < ApplicationController
 
   def create
     @transaction = current_user.transactions.new(transaction_params)
-    @transaction.transaction_type = determine_type(@transaction.amount)
+
+    if @transaction.expense?
+      @transaction.amount = -@transaction.amount.abs
+    end
 
     if @transaction.save
       redirect_to transactions_path, notice: "Transaction added successfully"
@@ -19,11 +22,6 @@ class ManualTransactionsController < ApplicationController
   private
 
   def transaction_params
-    params.require(:transaction).permit(:date, :description, :amount, :balance, :category_id, :source_file)
-  end
-
-  def determine_type(amount)
-    return :income if amount.to_f.positive?
-    :expense
+    params.require(:transaction).permit(:date, :description, :amount, :balance, :category_id, :source_file, :transaction_type)
   end
 end
