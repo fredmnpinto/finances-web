@@ -24,11 +24,10 @@ steps:
       TZ: "UTC"
       RAILS_ENV: test
       DATABASE_URL: postgres://admin:adminpass@postgres:5432/finances_web_test
-      PARALLEL_TEST_PROCESSES: "4"
     commands:
       - nix develop -c bundle exec rake assets:precompile RAILS_ENV=test
       - nix develop -c bundle exec rake db:create db:migrate RAILS_ENV=test
-      - nix develop -c bundle exec parallel_rspec -n 4
+      - nix develop -c bundle exec parallel_rspec
     when:
       - event: push
 
