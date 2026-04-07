@@ -41,7 +41,7 @@
 
         <div>
           <%= f.label :transaction_type, class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= f.select :transaction_type, options_for_select([["Expense", "expense"], ["Income", "income"], ["Savings", "savings"]]), { include_blank: "Select type" }, required: true, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          <%= f.select :transaction_type, options_for_select([["Expense", "expense"], ["Income", "income"], ["Savings", "savings"]]), {}, required: true, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
         </div>
 
         <div>
