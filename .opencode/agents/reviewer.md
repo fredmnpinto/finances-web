@@ -37,7 +37,14 @@ You receive:
 - Report pass/fail status
 - If tests fail, report which ones and why
 
-### 2. Lint Check
+### 2. Coverage Results
+- Run `bundle exec rspec` (which runs with SimpleCov coverage)
+- Parse the SimpleCov output for line coverage percentage
+- The output shows "X% lines covered" - extract that number
+- Report the coverage percentage in the review output
+- FLAG AS FAIL if coverage drops below 85%
+
+### 3. Lint Check
 - Run any linters if available (check package.json/Gemfile for available tools)
 
 ### 3. Code Review
@@ -72,6 +79,9 @@ All work happens in `/home/fred/Projects/finances/finances-web`
 ```
 ## Test Results
 [PASS/FAIL] - [summary]
+
+## Coverage Results
+[percentage]% lines covered - [PASS/FAIL] (threshold: 85%)
 
 ## Lint Results
 [PASS/FAIL] - [summary]
