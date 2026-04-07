@@ -117,6 +117,11 @@ export default class extends Controller {
     this.submitForm("bulk_update")
   }
 
+  deleteSelected() {
+    if (!confirm("Are you sure you want to delete the selected transactions?")) return
+    this.submitForm("destroy")
+  }
+
   submitForm(action) {
     const form = document.getElementById("bulk-action-form")
     document.getElementById("bulk-action-field").value = action

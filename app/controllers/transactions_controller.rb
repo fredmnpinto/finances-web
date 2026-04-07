@@ -4,7 +4,7 @@ class TransactionsController < ApplicationController
     @range = @month.beginning_of_month..@month.end_of_month
 
     base_transactions = current_user.transactions.where(date: @range)
-    @category_confirmation_filter = params[:category_confirmation_filter] || "unconfirmed"
+    @category_confirmation_filter = params[:category_confirmation_filter] || "all"
 
     filtered =
       base_transactions
@@ -96,6 +96,25 @@ class TransactionsController < ApplicationController
 
     redirect_to transactions_path(return_params),
                 notice: "Confirmed #{updated_count} suggested categories"
+  end
+
+  def bulk_destroy
+    transaction_ids = params[:transaction_ids].presence || []
+
+    if transaction_ids.blank?
+      redirect_to transactions_path(return_params), alert: "No transactions selected"
+      return
+    end
+
+    ids_array = transaction_ids.split(",")
+
+    deleted_count =
+      current_user.transactions
+        .where(id: ids_array)
+        .delete_all
+
+    redirect_to transactions_path(return_params),
+                notice: "Deleted #{deleted_count} transaction(s)"
   end
 
   private

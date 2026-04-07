@@ -103,6 +103,12 @@
             class="px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700">
       Confirm as Suggested
     </button>
+
+    <button type="button"
+            data-action="click->transaction-bulk#deleteSelected"
+            class="px-3 py-1.5 bg-red-600 text-white text-sm rounded-md hover:bg-red-700">
+      Delete
+    </button>
   </div>
 
   <!-- Hidden Bulk Form -->
@@ -226,6 +232,9 @@ document.addEventListener("turbo:load", function() {
           } else {
             categoryField.value = "suggested";
           }
+        } else if (actionField.value === "destroy") {
+          form.action = "<%= bulk_destroy_transactions_path %>";
+          form.method = "delete";
         }
 
         form.submit();

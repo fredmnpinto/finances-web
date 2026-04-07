@@ -22,15 +22,16 @@ Rails.application.routes.draw do
       get :categories
       patch :bulk_update_categories
       patch :confirm_all_suggested
+      delete :bulk_destroy
     end
     member do
       patch :confirm_category
     end
   end
 
-  resources :imports, only: [:new, :create]
+  resources :imports, only: [ :new, :create ]
   get "manual-transaction", to: "manual_transactions#new"
-  resources :manual_transactions, only: [:create]
+  resources :manual_transactions, only: [ :create ]
 
   resources :categories do
     collection do
