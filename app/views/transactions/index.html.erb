@@ -119,6 +119,7 @@
     <%= hidden_field_tag :transaction_ids, "", id: "bulk-ids-field" %>
     <%= hidden_field_tag :category_id, "", id: "bulk-category-field" %>
     <%= hidden_field_tag :action_type, "", id: "bulk-action-field" %>
+    <%= hidden_field_tag :_method, "", id: "bulk-method-field" %>
   <% end %>
 
   <!-- Transactions Table -->
@@ -234,7 +235,7 @@ document.addEventListener("turbo:load", function() {
           }
         } else if (actionField.value === "destroy") {
           form.action = "<%= bulk_destroy_transactions_path %>";
-          form.method = "delete";
+          document.getElementById("bulk-method-field").value = "delete";
         }
 
         form.submit();
