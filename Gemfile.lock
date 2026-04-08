@@ -240,8 +240,8 @@ GEM
       typhoeus (~> 1.4, >= 1.4.1)
     orm_adapter (0.5.0)
     ostruct (0.6.3)
-    parallel (1.27.0)
-    parallel_tests (4.10.1)
+    parallel (1.28.0)
+    parallel_tests (5.6.0)
       parallel
     parser (3.3.10.2)
       ast (~> 2.4.1)
@@ -489,7 +489,7 @@ DEPENDENCIES
   letter_opener (~> 1.8)
   mini_portile2
   ollama-ai (~> 1.3)
-  parallel_tests (~> 4.0)
+  parallel_tests (~> 5.6)
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)
