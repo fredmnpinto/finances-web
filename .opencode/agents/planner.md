@@ -69,3 +69,11 @@ Example:
 - Consider the test scenarios as a contract between you and the developer
 - Think about what could go wrong and flag those as edge cases
 - Don't over-plan - focus on the core task
+
+## Syntax & Documentation
+
+When uncertain about syntax:
+- ALWAYS consult official documentation first
+- Do NOT guess or assume syntax is correct
+- For bug investigations: Check documentation to verify correct usage vs what code is doing
+- If documentation is unclear, note this in your plan

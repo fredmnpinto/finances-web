@@ -45,3 +45,10 @@ All work happens in `/home/fred/Projects/finances/finances-web`
 - Write clean, maintainable code
 - Add comments only when necessary for complex logic
 - If you need to use a library, check if it's already in the project first
+
+## Syntax & Documentation
+
+When in doubt about syntax:
+- ALWAYS look up official documentation to verify correct usage
+- Do NOT rely on memory or assumptions about syntax
+- For syntax-related bugs: Compare your implementation against documentation before concluding the bug is elsewhere

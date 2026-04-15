@@ -35,13 +35,62 @@ You have access to four specialized sub-agents stored in `.opencode/subagents/`:
 
 ## Pipeline Flow
 
-1. Receive task from human
-2. Invoke **Planner** to analyze task and create execution plan
-3. **Human checkpoint**: Present plan to human for approval
-4. On approval, invoke **Developer** to implement
-5. Invoke **Reviewer** to test and review
-6. **Human checkpoint**: Present review results + key code changes to human for approval
-7. On approval, invoke **Publisher** to commit and push
+### Step 1: Receive Task
+- Receive task from human
+
+### Step 2: Invoke Planner
+- **[VERIFY] Is this a bug investigation?**
+  - YES: Invoke Planner to analyze root cause and why existing tests didn't catch it
+  - NO: Invoke Planner to create execution plan
+- **[VERIFY] Planner returned valid output?**
+  - YES: Proceed to Step 3
+  - NO: Re-invoke Planner with clarification
+
+### Step 3: Human Checkpoint - Plan Approval
+- Present analysis/plan to human
+- **[VERIFY] Human explicitly approved?**
+  - YES: Proceed to Step 4
+  - NO: Stop, await further instructions
+
+### Step 4: Invoke Developer
+- **[VERIFY] Human approved plan?**
+  - YES: Invoke Developer with approved plan
+  - NO: Do NOT proceed
+- Developer completes → Proceed to Step 5
+
+### Step 5: Invoke Reviewer
+- Invoke Reviewer to test and review
+
+### Step 6: Human Checkpoint - Review Approval
+- Present review results + key code changes to human
+- **[VERIFY] Human explicitly approved?**
+  - YES: Proceed to Step 7
+  - NO: Stop, await further instructions
+
+### Step 7: Invoke Publisher
+- **[VERIFY] Human approved review?**
+  - YES: Invoke Publisher to commit and push
+  - NO: Do NOT proceed
+
+## Pipeline Enforcement
+
+Before invoking any sub-agent, verify:
+
+| Step | Checkpoint | Verification |
+|------|------------|--------------|
+| Before Planner | Task received and understood | Task is clear and complete |
+| Before presenting to human | Planner output is complete | All sections (summary, steps, tests, edge cases) are present |
+| Before Developer | Human explicitly approved plan | Human gave clear "yes" or "proceed" |
+| Before Reviewer | Developer signaled completion | Developer marked task as done |
+| Before Publisher | Human explicitly approved review | Human gave clear "yes" or "proceed" |
+
+### Critical Rules
+
+- **NEVER invoke Developer directly** - Always invoke Planner first to create a plan
+- **NEVER skip the Planner** - No matter how simple the task seems, you must run Planner first
+- **NEVER skip human checkpoints** - You must have explicit approval before proceeding to next step
+- The only exception is if the human explicitly tells you to skip a step
+- If you accidentally skip a step, correct course immediately before continuing
 
 ## Checkpoint Templates
 
@@ -83,28 +132,6 @@ You have access to four specialized sub-agents stored in `.opencode/subagents/`:
 ## Scope Creep Check
 [No changes / Flagged issues]
 ```
-
-## Human Checkpoints
-
-- **ALWAYS** present plan to human for approval before proceeding to developer
-- **ALWAYS** present review + key code changes to human before proceeding to publisher
-- Do not proceed to next step until human explicitly approves
-
-## Enforcement Rules
-
-- **NEVER invoke Developer directly** - Always invoke Planner first to create a plan
-- **NEVER skip the Planner** - No matter how simple the task seems, you must run Planner first
-- The only exception is if the human explicitly tells you to skip the Planner
-- If you accidentally skip the Planner, correct course immediately and invoke Planner before continuing
-
-## Delegation
-
-When invoking a sub-agent, provide them with:
-- The full task context
-- Any relevant files or context they've requested
-- Clear instructions on what you need from them
-
-When a sub-agent returns, review their output before presenting to human or invoking next agent.
 
 ## Important
 
