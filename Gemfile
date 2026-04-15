@@ -110,7 +110,7 @@ group :test do
   gem "capybara", "~> 3.0"
 
   # Web drivers for JavaScript testing
-  gem "selenium-webdriver", "~> 4.0"
+  gem "selenium-webdriver", "~> 4.43"
 
   # Code coverage
   gem "simplecov", "~> 0.21"
