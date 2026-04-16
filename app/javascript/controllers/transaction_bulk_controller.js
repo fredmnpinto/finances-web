@@ -144,7 +144,7 @@ export default class extends Controller {
       body: `transaction_ids=${ids}&category_id=${category}&return_params=${returnParams}`
     }).then(response => {
       if (response.ok || response.redirected) {
-        window.location.reload()
+        window.location.href = window.location.href
       } else {
         alert("Failed to update transactions")
       }
@@ -180,7 +180,7 @@ export default class extends Controller {
       body: `transaction_ids=${ids}`
     }).then(response => {
       if (response.ok || response.redirected) {
-        window.location.reload()
+        window.location.href = window.location.href
       } else {
         // Restore button state on error
         deleteButton.disabled = false
