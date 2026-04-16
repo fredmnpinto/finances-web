@@ -13,6 +13,13 @@ export default class extends Controller {
         e.stopImmediatePropagation()
       }
     })
+
+    // T007: Add Delete key keyboard shortcut
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Delete" && !this.toolbarTarget.classList.contains("hidden")) {
+        this.deleteSelected()
+      }
+    })
   }
 
   toggleSelect(event) {
@@ -107,24 +114,84 @@ export default class extends Controller {
   }
 
   confirmSelected() {
-    this.submitForm("confirm")
+    const count = this.selectedIds.size
+    if (count === 0) return
+
+    if (count === 1) {
+      // Single selection: use the individual confirm endpoint
+      const id = Array.from(this.selectedIds)[0]
+      window.location.href = `/transactions/${id}/confirm_category?return_params=${encodeURIComponent(window.location.search)}`
+    } else {
+      // Multiple: use bulk update with suggested category
+      this.bulkUpdateSelected("suggested")
+    }
   }
 
-  bulkUpdateSelected() {
-    const category = document.getElementById("bulk-category-select").value
+  bulkUpdateSelected(categoryOverride = null) {
+    const category = categoryOverride || document.getElementById("bulk-category-select").value
     if (!category) return
-    document.getElementById("bulk-category-field").value = category
-    this.submitForm("bulk_update")
+
+    const ids = Array.from(this.selectedIds).join(",")
+    const token = document.querySelector('meta[name="csrf-token"]').content
+    const returnParams = encodeURIComponent(window.location.search)
+
+    fetch("/transactions/bulk_update_categories", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRF-Token": token
+      },
+      body: `transaction_ids=${ids}&category_id=${category}&return_params=${returnParams}`
+    }).then(response => {
+      if (response.ok || response.redirected) {
+        window.location.reload()
+      } else {
+        alert("Failed to update transactions")
+      }
+    }).catch(() => {
+      alert("Failed to update transactions")
+    })
   }
 
+  // T004: Rewrite deleteSelected() with fetch DELETE
   deleteSelected() {
-    if (!confirm("Are you sure you want to delete the selected transactions?")) return
-    this.submitForm("destroy")
-  }
+    const count = this.selectedIds.size
+    if (count === 0) return
 
-  submitForm(action) {
-    const form = document.getElementById("bulk-action-form")
-    document.getElementById("bulk-action-field").value = action
-    form.requestSubmit()
+    // Add confirmation dialog (REQUIRED BY SPEC)
+    if (!confirm(`Delete ${count} transaction${count > 1 ? 's' : ''}?`)) return
+
+    // T005: Add loading state on Delete button
+    const deleteButton = this.toolbarTarget.querySelector('button[data-action*="deleteSelected"]')
+    const originalText = deleteButton.textContent
+    deleteButton.disabled = true
+    deleteButton.textContent = "Deleting..."
+
+    const ids = Array.from(this.selectedIds).join(",")
+    const token = document.querySelector('meta[name="csrf-token"]').content
+
+    // T006: Add error handling
+    fetch("/transactions/bulk_destroy", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRF-Token": token
+      },
+      body: `transaction_ids=${ids}`
+    }).then(response => {
+      if (response.ok || response.redirected) {
+        window.location.reload()
+      } else {
+        // Restore button state on error
+        deleteButton.disabled = false
+        deleteButton.textContent = originalText
+        alert("Failed to delete transactions")
+      }
+    }).catch(() => {
+      // Restore button state on error
+      deleteButton.disabled = false
+      deleteButton.textContent = originalText
+      alert("Failed to delete transactions")
+    })
   }
 }

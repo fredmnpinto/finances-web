@@ -111,17 +111,6 @@
     </button>
   </div>
 
-  <!-- Hidden Bulk Form -->
-  <%= form_with url: bulk_update_categories_transactions_path, method: :patch, id: "bulk-action-form" do %>
-    <%= hidden_field_tag :year, @month.year %>
-    <%= hidden_field_tag :month, @month.month %>
-    <%= hidden_field_tag :category_confirmation_filter, @category_confirmation_filter %>
-    <%= hidden_field_tag :transaction_ids, "", id: "bulk-ids-field" %>
-    <%= hidden_field_tag :category_id, "", id: "bulk-category-field" %>
-    <%= hidden_field_tag :action_type, "", id: "bulk-action-field" %>
-    <%= hidden_field_tag :_method, "", id: "bulk-method-field" %>
-  <% end %>
-
   <!-- Transactions Table -->
   <div class="bg-white rounded-xl shadow overflow-hidden">
     <table class="w-full text-sm">
@@ -210,37 +199,3 @@
   </div>
 
 </div>
-
-<script>
-document.addEventListener("turbo:load", function() {
-  const form = document.getElementById("bulk-action-form");
-  const idsField = document.getElementById("bulk-ids-field");
-  const categoryField = document.getElementById("bulk-category-field");
-  const actionField = document.getElementById("bulk-action-field");
-
-  document.addEventListener("submit", function(e) {
-    if (e.target.id === "bulk-action-form") {
-      e.preventDefault();
-
-      const controller = window.Stimulus.controllers.find(c => c.identifier === "transaction-bulk");
-      if (controller) {
-        idsField.value = Array.from(controller.selectedIds).join(",");
-        
-        if (actionField.value === "confirm") {
-          const ids = idsField.value.split(",");
-          if (ids.length === 1) {
-            form.action = "<%= confirm_category_transaction_path(":id").gsub(':id', '') %>" + ids[0];
-          } else {
-            categoryField.value = "suggested";
-          }
-        } else if (actionField.value === "destroy") {
-          form.action = "<%= bulk_destroy_transactions_path %>";
-          document.getElementById("bulk-method-field").value = "delete";
-        }
-
-        form.submit();
-      }
-    }
-  });
-});
-</script>
