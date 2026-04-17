@@ -127,7 +127,17 @@ export default class extends Controller {
     }
   }
 
-  bulkUpdateSelected(categoryOverride = null) {
+  bulkUpdateSelected(arg1, arg2) {
+    // Handle both Stimulus calls (event, [categoryOverride]) and direct calls (categoryOverride)
+    let categoryOverride = null;
+    if (typeof arg1 === 'string') {
+      // Direct call: bulkUpdateSelected("suggested")
+      categoryOverride = arg1;
+    } else {
+      // Stimulus call: bulkUpdateSelected(event, [categoryOverride])
+      categoryOverride = arg2;
+    }
+    
     const category = categoryOverride || document.getElementById("bulk-category-select").value
     if (!category) return
 
@@ -143,11 +153,10 @@ export default class extends Controller {
       },
       body: `transaction_ids=${ids}&category_id=${category}&return_params=${returnParams}`
     }).then(response => {
-      if (response.ok || response.redirected) {
-        window.location.href = window.location.href
-      } else {
-        alert("Failed to update transactions")
+      if (response.ok) {
+        // Successful non-redirect response - handled
       }
+      // For redirect responses, browser handles automatically
     }).catch(() => {
       alert("Failed to update transactions")
     })
@@ -179,14 +188,10 @@ export default class extends Controller {
       },
       body: `transaction_ids=${ids}`
     }).then(response => {
-      if (response.ok || response.redirected) {
-        window.location.href = window.location.href
-      } else {
-        // Restore button state on error
-        deleteButton.disabled = false
-        deleteButton.textContent = originalText
-        alert("Failed to delete transactions")
+      if (response.ok) {
+        // Successful non-redirect response - handled
       }
+      // For redirect responses, browser handles automatically
     }).catch(() => {
       // Restore button state on error
       deleteButton.disabled = false
