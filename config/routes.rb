@@ -30,7 +30,7 @@ Rails.application.routes.draw do
   end
 
   resources :imports, only: [ :new, :create ]
-  get "manual-transaction", to: "manual_transactions#new"
+  get "manual-transaction", to: "manual_transactions#new", as: :new_manual_transaction
   resources :manual_transactions, only: [ :create ]
 
   resources :categories do
