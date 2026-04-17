@@ -113,6 +113,27 @@ export default class extends Controller {
     }
   }
 
+  resetToolbar() {
+    // Clear selectedIds Set
+    this.selectedIds.clear()
+
+    // Uncheck all checkboxes and remove highlights from rows
+    this.rowTargets.forEach((row) => {
+      row.classList.remove("bg-blue-50")
+      const checkbox = row.querySelector('input[type="checkbox"]')
+      if (checkbox) checkbox.checked = false
+    })
+
+    // Hide toolbar
+    this.toolbarTarget.classList.add("hidden")
+
+    // Reset selectAll checkbox
+    this.selectAllTarget.checked = false
+
+    // Update count display
+    this.countTarget.textContent = "0"
+  }
+
   confirmSelected() {
     const count = this.selectedIds.size
     if (count === 0) return
@@ -153,11 +174,12 @@ export default class extends Controller {
       },
       body: `transaction_ids=${ids}&category_id=${category}&return_params=${returnParams}`
     }).then(response => {
-      if (response.ok) {
-        // Successful non-redirect response - handled
+      if (response.ok || response.redirected) {
+        this.resetToolbar()
+        window.location.reload()  // Reload to show flash notice and updated categories
       }
-      // For redirect responses, browser handles automatically
     }).catch(() => {
+      this.resetToolbar()
       alert("Failed to update transactions")
     })
   }
@@ -188,11 +210,12 @@ export default class extends Controller {
       },
       body: `transaction_ids=${ids}`
     }).then(response => {
-      if (response.ok) {
-        // Successful non-redirect response - handled
+      if (response.ok || response.redirected) {
+        this.resetToolbar()
+        window.location.reload()
       }
-      // For redirect responses, browser handles automatically
     }).catch(() => {
+      this.resetToolbar()
       // Restore button state on error
       deleteButton.disabled = false
       deleteButton.textContent = originalText
