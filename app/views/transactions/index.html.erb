@@ -157,7 +157,7 @@
                   <% if tx.category.icon.present? %>
                     <span><%= tx.category.icon %></span>
                   <% end %>
-                  <span class="text-green-700"><%= tx.category.name %></span>
+                  <span class="<%= tx.category.income? || tx.category.savings? ? 'text-green-700' : 'text-red-700' %>"><%= tx.category.name %></span>
                 </span>
               <% elsif tx.suggested_category %>
                 <div class="flex items-center gap-1.5">
@@ -167,7 +167,7 @@
                   <% if tx.suggested_category.icon.present? %>
                     <span class="opacity-50"><%= tx.suggested_category.icon %></span>
                   <% end %>
-                  <span class="text-gray-700"><%= tx.suggested_category.name %></span>
+                  <span class="<%= tx.suggested_category.income? || tx.suggested_category.savings? ? 'text-green-700' : 'text-red-700' %>"><%= tx.suggested_category.name %></span>
                   <span class="text-xs text-gray-400">(suggested)</span>
                 </div>
               <% else %>
