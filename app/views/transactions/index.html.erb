@@ -150,23 +150,35 @@
 
             <td class="px-4 py-3">
               <% if tx.category %>
-                <span class="inline-flex items-center gap-1.5">
+                <% emoji = case tx.transaction_type
+                  when 'expense' then '💸'
+                  when 'income' then '💰'
+                  when 'savings' then '📊'
+                  end %>
+                <span class="inline-flex items-center gap-1.5 group" title="<%= tx.transaction_type.to_s.titleize %>">
                   <% if tx.category.color %>
                     <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= tx.category.color %>"></span>
                   <% end %>
                   <% if tx.category.icon.present? %>
                     <span><%= tx.category.icon %></span>
                   <% end %>
+                  <span class="cursor-help" title="<%= tx.transaction_type.to_s.titleize %>"><%= emoji %></span>
                   <span class="<%= tx.category.income? || tx.category.savings? ? 'text-green-700' : 'text-red-700' %>"><%= tx.category.name %></span>
                 </span>
               <% elsif tx.suggested_category %>
-                <div class="flex items-center gap-1.5">
+                <% emoji = case tx.transaction_type
+                  when 'expense' then '💸'
+                  when 'income' then '💰'
+                  when 'savings' then '📊'
+                  end %>
+                <div class="flex items-center gap-1.5 group" title="<%= tx.transaction_type.to_s.titleize %>">
                   <% if tx.suggested_category.color %>
                     <span class="h-2.5 w-2.5 rounded-full opacity-50" style="background-color: <%= tx.suggested_category.color %>"></span>
                   <% end %>
                   <% if tx.suggested_category.icon.present? %>
                     <span class="opacity-50"><%= tx.suggested_category.icon %></span>
                   <% end %>
+                  <span class="cursor-help" title="<%= tx.transaction_type.to_s.titleize %>"><%= emoji %></span>
                   <span class="<%= tx.suggested_category.income? || tx.suggested_category.savings? ? 'text-green-700' : 'text-red-700' %>"><%= tx.suggested_category.name %></span>
                   <span class="text-xs text-gray-400">(suggested)</span>
                 </div>
