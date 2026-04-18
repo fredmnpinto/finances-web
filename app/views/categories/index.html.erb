@@ -1,6 +1,6 @@
 <div class="flex justify-between items-center mb-6">
   <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
-  <%= button_to "Reset to Defaults", reset_categories_path, method: :post, class: "text-sm text-gray-500 hover:text-gray-700" if false %>
+  <%= button_to "Reset to Defaults", reset_categories_path, method: :post, class: "text-sm text-gray-500 hover:text-gray-700" %>
 </div>
 
 <% if @categories.empty? %>
@@ -48,10 +48,14 @@
           <span class="text-sm text-gray-500">Optional</span>
         </div>
       </div>
-      <div>
-        <%= f.label :icon, "Icon (emoji)", class: "block text-sm font-medium text-gray-700" %>
-        <%= f.text_field :icon, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "🍕" %>
-      </div>
+<div>
+      <%= f.label :icon, "Icon (emoji)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :icon, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "🍕" %>
+    </div>
+    <div>
+      <%= f.label :category_group, "Category Group", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.select :category_group, options_for_select(Category.category_groups.keys.map { |g| [g.humanize, g] }), { include_blank: "Select a group" }, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+    </div>
     </div>
     <div>
       <%= f.submit "Create Category", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>

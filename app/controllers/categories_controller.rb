@@ -19,6 +19,14 @@ class CategoriesController < ApplicationController
     end
   end
 
+  def show
+    @category = current_user.categories.find(params[:id])
+  end
+
+  def edit
+    @category = current_user.categories.find(params[:id])
+  end
+
   def update
     @category = current_user.categories.find(params[:id])
 
@@ -36,9 +44,14 @@ class CategoriesController < ApplicationController
     redirect_to categories_path, notice: "Category deleted"
   end
 
+  def reset
+    current_user.categories.reset_to_defaults!
+    redirect_to categories_path, notice: "Categories reset to defaults"
+  end
+
   private
 
   def category_params
-    params.require(:category).permit(:name, :color, :icon)
+    params.require(:category).permit(:name, :color, :icon, :category_group)
   end
 end

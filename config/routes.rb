@@ -36,6 +36,7 @@ Rails.application.routes.draw do
   resources :categories do
     collection do
       get :options
+      post :reset
     end
   end
 
