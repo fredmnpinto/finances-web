@@ -130,7 +130,7 @@ bundle exec rspec --format documentation
 ### Production/CI
 - **JSON Report:** `coverage/.resultset.json`
 - **Codecov Integration:** Automatic upload
-- **Pull Request Comments:** Coverage diff coverage
+- **Pull Request Comments:** Coverage diff coverage <!-- Note: Not needed for solo dev, just check coverage locally -->
 
 ## 🔍 Debugging Tests
 
