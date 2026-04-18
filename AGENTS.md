@@ -50,8 +50,11 @@ rails db:migrate            # Run migrations
 ## Pre-commit Checks
 
 ```bash
-bundle exec rspec
-bundle exec rubocop
+# Run tests on modified files only
+git diff --name-only | xargs bundle exec rspec --
+
+# Run rubocop on modified files only  
+git diff --name-only | xargs bundle exec rubocop --force-exclusion
 ```
 
 Do not commit if any tests fail or lint has errors.
@@ -124,7 +127,7 @@ These override anything set in shellHook. System ruby bypasses this wrapper enti
 ## Boundaries
 
 ✅ **Always do:**
-- Run rspec + rubocop before committing
+- Run tests + lint on modified files only before committing
 - Use enums for status fields
 - Follow existing file organization
 - Use FactoryBot for test data
