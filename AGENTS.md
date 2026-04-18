@@ -58,6 +58,33 @@ Do not commit if any tests fail or lint has errors.
 
 ---
 
+## Commit Message Format
+
+Use this format for all commits:
+
+```
+type(scope): Message describing the change
+```
+
+### Types
+- `feat` - New feature
+- `bugfix` - Bug fix
+- `docs` - Documentation only
+- `chore` - Maintenance, deps, refactoring
+- `test` - Test changes
+
+### Examples
+```
+feat(transactions-delete): Add delete button to transactions list
+bugfix(bulk-update): Fix redirect after bulk status change
+docs(readme): Add deployment troubleshooting section
+chore(deps): Update rails to 8.1.2
+```
+
+Note: Since this is solo dev, no PR prefix needed - just direct commits.
+
+---
+
 ## Adding Gems
 
 This project uses bundlerEnv with nix. The workflow for adding gems is:
