@@ -1,14 +1,60 @@
 # Agent Instructions
 
-## Pre-commit Checks
+## Tech Stack
+- Rails 8.1.x
+- Ruby 3.x
+- PostgreSQL
+- Sidekiq (solid_queue)
+- Hotwire (Turbo + Stimulus)
+- Tailwind CSS
+- RSpec
+- Devise
 
-ALWAYS run rspec before committing code changes:
+## Project Structure
+- `app/models/` - Domain models
+- `app/controllers/` - Controllers
+- `app/views/` - Views (ERB)
+- `app/services/` - Service objects
+- `app/jobs/` - ActiveJob jobs
+- `app/javascript/` - Stimulus controllers
+- `spec/` - RSpec tests (models, requests, features, services)
+- `config/` - Configuration
+
+## Commands
+
+```bash
+bundle exec rspec              # Run all tests
+bundle exec rspec spec/models/ # Run model specs
+bundle exec rspec spec/features/ # Run feature specs
+bundle exec rspec spec/services/ # Run service specs
+bundle exec rspec spec/path/to/spec.rb:42  # Run specific spec
+bundle exec rubocop            # Check lint issues
+rails c                      # Console
+rails s                      # Server
+rails db:migrate            # Run migrations
+```
+
+## Code Conventions
+- Use enums for state/status fields (not string columns)
+- Keep models under 100 lines; extract concerns for shared behavior
+- Use `scope:` for common queries
+- Controller methods should be thin; delegate to services
+- Use `preload`/`includes` to avoid N+1 queries
+- Follow Rails naming: `snake_case` files, `PascalCase` classes
+
+## Testing
+- Use FactoryBot for test data
+- Model org order: associations → enums → validations → scopes → methods
+- Test both default behavior AND explicit overrides
+
+## Pre-commit Checks
 
 ```bash
 bundle exec rspec
+bundle exec rubocop
 ```
 
-Do not commit if any tests fail.
+Do not commit if any tests fail or lint has errors.
 
 ---
 
@@ -45,3 +91,25 @@ The bundlerEnv wrapper has hardcoded environment variables pointing to the nix s
 - `BUNDLE_FROZEN=1` (prevents lockfile modification)
 
 These override anything set in shellHook. System ruby bypasses this wrapper entirely.
+
+---
+
+## Boundaries
+
+✅ **Always do:**
+- Run rspec + rubocop before committing
+- Use enums for status fields
+- Follow existing file organization
+- Use FactoryBot for test data
+
+⚠️ **Ask first:**
+- Adding new gems
+- Modifying existing migrations
+- Changing database schema
+- Creating new models
+
+🚫 **Never:**
+- Commit with failing tests
+- Commit with rubocop errors
+- Add secrets to git
+- Modify config files without approval
