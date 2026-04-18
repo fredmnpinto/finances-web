@@ -1,0 +1,9 @@
+/* Emoji Picker Toggle Styles */
+
+[data-controller="emoji-picker"] [data-emoji-picker-target="pickerContainer"] {
+  display: none;
+}
+
+[data-controller="emoji-picker"] [data-emoji-picker-target="pickerContainer"].open {
+  display: block;
+}

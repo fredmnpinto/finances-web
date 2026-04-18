@@ -21,9 +21,26 @@
           <span class="text-sm text-gray-500">Optional</span>
         </div>
       </div>
-<div>
-      <%= f.label :icon, "Icon (emoji)", class: "block text-sm font-medium text-gray-700" %>
-      <%= f.text_field :icon, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "🍕" %>
+      <div>
+        <%= f.label :icon, "Icon (emoji)", class: "block text-sm font-medium text-gray-700" %>
+        <div class="mt-1 relative" data-controller="emoji-picker">
+          <div class="flex rounded-md shadow-sm">
+            <%= f.text_field :icon,
+                data: { "emoji-picker-target": "input" },
+                class: "flex-1 block w-full rounded-l-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
+                placeholder: "Select emoji",
+                maxlength: 1 %>
+            <button type="button"
+                    data-action="emoji-picker#toggle"
+                    data-emoji-picker-target="trigger"
+                    class="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm hover:bg-gray-100">
+              😀
+            </button>
+          </div>
+          <div data-emoji-picker-target="pickerContainer" class="hidden absolute z-10 mt-1">
+          </div>
+        </div>
+      </div>
     </div>
 
     <div>
