@@ -208,4 +208,178 @@ RSpec.describe ImportTransactions do
       expect(import_service.send(:determine_type, -50.00)).to eq(:expense)
     end
   end
+
+  describe 'applies category rules from CategoryRecommender' do
+    let(:file) { fixture_file_upload('test.csv', 'text/csv') }
+    let(:spreadsheet) { instance_double(Roo::Excelx) }
+    let(:sheet) { instance_double(Roo::Excelx) }
+    let(:category_test_user) { create(:user) }
+
+    before do
+      Transaction.where(user: category_test_user).delete_all
+      Category.where(user: category_test_user).delete_all
+      # Create categories that match CategoryRecommender rules
+      create(:category, user: category_test_user, name: "Salary")
+      create(:category, user: category_test_user, name: "Food")
+      create(:category, user: category_test_user, name: "Transport")
+      create(:category, user: category_test_user, name: "Utilities")
+
+      # Allow actual file parsing
+      allow(Roo::Spreadsheet).to receive(:open).and_return(spreadsheet)
+      allow(spreadsheet).to receive(:sheet).with(0).and_return(sheet)
+
+      # CRITICAL: We need to prevent the outer describe's stub from taking effect
+      # Reset ALL CategoryRecommender.new stubs first
+      allow(CategoryRecommender).to receive(:new).and_call_original
+    end
+
+    # Override to specifically use our test user
+    subject(:import_service) { described_class.new(category_test_user) }
+
+    it 'matches "salary" description to Salary category' do
+      # Use a unique description to find our specific transaction
+      test_description = 'SALARY CLOUDCARE TEST UNIQUE'
+
+      allow(sheet).to receive(:first_row).and_return(1)
+      allow(sheet).to receive(:last_row).and_return(2)
+      allow(sheet).to receive(:row).with(1).and_return(
+        [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+      )
+      allow(sheet).to receive(:row).with(2).and_return(
+        [ '15-01-2024', '15-01-2024', test_description, '2500.00', '1000.00' ]
+      )
+
+      import_service.call(file)
+
+      # Query specifically for our transaction by description
+      transaction = Transaction.where(user: category_test_user, description: test_description).first!
+      expect(transaction.suggested_category.name).to eq('Salary')
+    end
+
+    it 'matches "ordenado" description to Salary category' do
+      test_description = 'ORDENADO JANEIRO TEST'
+
+      allow(sheet).to receive(:first_row).and_return(1)
+      allow(sheet).to receive(:last_row).and_return(2)
+      allow(sheet).to receive(:row).with(1).and_return(
+        [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+      )
+      allow(sheet).to receive(:row).with(2).and_return(
+        [ '15-01-2024', '15-01-2024', test_description, '2500.00', '1000.00' ]
+      )
+
+      import_service.call(file)
+
+      transaction = Transaction.where(user: category_test_user, description: test_description).first!
+      expect(transaction.suggested_category.name).to eq('Salary')
+    end
+
+    it 'matches "continente" description to Food category' do
+      test_description = 'CONTINENTE TEST'
+
+      allow(sheet).to receive(:first_row).and_return(1)
+      allow(sheet).to receive(:last_row).and_return(2)
+      allow(sheet).to receive(:row).with(1).and_return(
+        [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+      )
+      allow(sheet).to receive(:row).with(2).and_return(
+        [ '15-01-2024', '15-01-2024', test_description, '-45.00', '1000.00' ]
+      )
+
+      import_service.call(file)
+
+      transaction = Transaction.where(user: category_test_user, description: test_description).first!
+      expect(transaction.suggested_category.name).to eq('Food')
+    end
+
+    it 'matches "pingo doce" description to Food category' do
+      test_description = 'PINGO DOCE TEST'
+
+      allow(sheet).to receive(:first_row).and_return(1)
+      allow(sheet).to receive(:last_row).and_return(2)
+      allow(sheet).to receive(:row).with(1).and_return(
+        [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+      )
+      allow(sheet).to receive(:row).with(2).and_return(
+        [ '15-01-2024', '15-01-2024', test_description, '-30.00', '1000.00' ]
+      )
+
+      import_service.call(file)
+
+      transaction = Transaction.where(user: category_test_user, description: test_description).first!
+      expect(transaction.suggested_category.name).to eq('Food')
+    end
+
+    it 'matches "uber" description to Transport category' do
+      test_description = 'UBER TRIP TEST'
+
+      allow(sheet).to receive(:first_row).and_return(1)
+      allow(sheet).to receive(:last_row).and_return(2)
+      allow(sheet).to receive(:row).with(1).and_return(
+        [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+      )
+      allow(sheet).to receive(:row).with(2).and_return(
+        [ '15-01-2024', '15-01-2024', test_description, '-15.00', '1000.00' ]
+      )
+
+      import_service.call(file)
+
+      transaction = Transaction.where(user: category_test_user, description: test_description).first!
+      expect(transaction.suggested_category.name).to eq('Transport')
+    end
+
+    it 'matches "bolt" description to Transport category' do
+      test_description = 'BOLT TEST'
+
+      allow(sheet).to receive(:first_row).and_return(1)
+      allow(sheet).to receive(:last_row).and_return(2)
+      allow(sheet).to receive(:row).with(1).and_return(
+        [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+      )
+      allow(sheet).to receive(:row).with(2).and_return(
+        [ '15-01-2024', '15-01-2024', test_description, '-12.00', '1000.00' ]
+      )
+
+      import_service.call(file)
+
+      transaction = Transaction.where(user: category_test_user, description: test_description).first!
+      expect(transaction.suggested_category.name).to eq('Transport')
+    end
+
+    it 'matches "edp" description to Utilities category' do
+      test_description = 'EDP TEST'
+
+      allow(sheet).to receive(:first_row).and_return(1)
+      allow(sheet).to receive(:last_row).and_return(2)
+      allow(sheet).to receive(:row).with(1).and_return(
+        [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+      )
+      allow(sheet).to receive(:row).with(2).and_return(
+        [ '15-01-2024', '15-01-2024', test_description, '-80.00', '1000.00' ]
+      )
+
+      import_service.call(file)
+
+      transaction = Transaction.where(user: category_test_user, description: test_description).first!
+      expect(transaction.suggested_category.name).to eq('Utilities')
+    end
+
+    it 'matches "vodafone" description to Utilities category' do
+      test_description = 'VODAFONE TEST'
+
+      allow(sheet).to receive(:first_row).and_return(1)
+      allow(sheet).to receive(:last_row).and_return(2)
+      allow(sheet).to receive(:row).with(1).and_return(
+        [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+      )
+      allow(sheet).to receive(:row).with(2).and_return(
+        [ '15-01-2024', '15-01-2024', test_description, '-35.00', '1000.00' ]
+      )
+
+      import_service.call(file)
+
+      transaction = Transaction.where(user: category_test_user, description: test_description).first!
+      expect(transaction.suggested_category.name).to eq('Utilities')
+    end
+  end
 end
