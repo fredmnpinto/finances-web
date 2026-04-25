@@ -26,9 +26,9 @@ RSpec.describe 'Transactions', type: :feature do
     end
 
     it 'displays user\'s transactions in chronological order' do
-      create(:transaction, :uncategorized, user: user, date: "2026-04-01", description: 'Rent')
-      create(:transaction, :uncategorized, user: user, date: "2026-04-02", description: 'Groceries')
-      create(:transaction, :uncategorized, user: user, date: "2026-04-03", description: 'Gas')
+      create(:transaction, :uncategorized, user: user, transaction_date: "2026-04-01", description: 'Rent')
+      create(:transaction, :uncategorized, user: user, transaction_date: "2026-04-02", description: 'Groceries')
+      create(:transaction, :uncategorized, user: user, transaction_date: "2026-04-03", description: 'Gas')
 
       visit_transactions(year: 2026, month: 4)
 
@@ -45,7 +45,7 @@ RSpec.describe 'Transactions', type: :feature do
         user: user,
         amount: -150.75,
         description: 'Weekly Groceries',
-        date: Date.current,
+        transaction_date: Date.current,
         category: food_category
       )
 
@@ -72,8 +72,8 @@ RSpec.describe 'Transactions', type: :feature do
 
   describe 'Transaction Filtering' do
     it 'filters by transaction type' do
-      create(:transaction, :income, user: user, amount: 2000.00, date: Date.current, description: 'Salary')
-      create(:transaction, user: user, amount: -500.00, date: Date.current, description: 'Rent')
+      create(:transaction, :income, user: user, amount: 2000.00, transaction_date: Date.current, description: 'Salary')
+      create(:transaction, user: user, amount: -500.00, transaction_date: Date.current, description: 'Rent')
 
       visit_transactions(type: 'expenses')
 
@@ -83,8 +83,8 @@ RSpec.describe 'Transactions', type: :feature do
     end
 
     it 'filters by income' do
-      create(:transaction, :income, user: user, amount: 2000.00, date: Date.current, description: 'Salary')
-      create(:transaction, user: user, amount: -500.00, date: Date.current, description: 'Rent')
+      create(:transaction, :income, user: user, amount: 2000.00, transaction_date: Date.current, description: 'Salary')
+      create(:transaction, user: user, amount: -500.00, transaction_date: Date.current, description: 'Rent')
 
       visit_transactions(type: 'income')
 
@@ -119,8 +119,8 @@ RSpec.describe 'Transactions', type: :feature do
   describe 'Month Context' do
     it 'shows transactions for the selected month' do
       # Create transactions for different months
-      this_month = create(:transaction, user: user, date: Date.current, description: 'Current Month')
-      last_month = create(:transaction, user: user, date: 1.month.ago, description: 'Last Month')
+      this_month = create(:transaction, user: user, transaction_date: Date.current, description: 'Current Month')
+      last_month = create(:transaction, user: user, transaction_date: 1.month.ago, description: 'Last Month')
 
       visit_transactions(year: Date.current.year, month: Date.current.month)
 
@@ -130,7 +130,7 @@ RSpec.describe 'Transactions', type: :feature do
 
     it 'updates category filter based on current month' do
       food_category = create(:category, name: "Food-#{SecureRandom.hex(4)}", user: user)
-      create(:transaction, user: user, date: Date.current, category: food_category, description: 'Groceries')
+      create(:transaction, user: user, transaction_date: Date.current, category: food_category, description: 'Groceries')
 
       visit_transactions(year: Date.current.year, month: Date.current.month)
 

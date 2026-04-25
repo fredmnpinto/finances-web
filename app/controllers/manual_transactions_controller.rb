@@ -27,6 +27,6 @@ class ManualTransactionsController < ApplicationController
   private
 
   def transaction_params_without_add_another
-    params.require(:transaction).permit(:date, :description, :amount, :balance, :category_id, :source_file, :transaction_type)
+    params.require(:transaction).permit(:transaction_date, :description, :amount, :balance, :category_id, :source_file, :transaction_type)
   end
 end

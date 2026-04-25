@@ -84,7 +84,7 @@
           <% @largest_expenses.each do |tx| %>
             <tr class="border-b last:border-0">
               <td class="py-2 text-gray-600">
-                <%= tx.date.strftime("%b %d") %>
+                <%= tx.transaction_date.strftime("%b %d") %>
               </td>
               <td class="py-2">
                 <%= tx.description %>

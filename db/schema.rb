@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_19_100001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_25_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,23 +26,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_19_100001) do
     t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
-  create_table "transactions", force: :cascade do |t|
+  create_table "transactions", id: :serial, force: :cascade do |t|
     t.decimal "amount", null: false
     t.decimal "balance"
     t.bigint "category_id"
-    t.datetime "created_at", null: false
-    t.date "date", null: false
+    t.datetime "created_at", precision: nil, default: -> { "CURRENT_TIMESTAMP" }
     t.text "description", null: false
     t.text "source_file"
     t.bigint "suggested_category_id"
+    t.date "transaction_date", null: false
     t.integer "transaction_type"
-    t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.date "value_date"
     t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["suggested_category_id"], name: "index_transactions_on_suggested_category_id"
     t.index ["user_id"], name: "index_transactions_on_user_id"
-    t.unique_constraint ["date", "description", "amount", "balance"], name: "transactions_date_description_amount_balance_key"
+    t.unique_constraint ["transaction_date", "description", "amount", "balance"], name: "transactions_date_description_amount_balance_key"
   end
 
   create_table "users", force: :cascade do |t|
@@ -71,4 +70,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_19_100001) do
   add_foreign_key "categories", "users"
   add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "categories", column: "suggested_category_id"
+  add_foreign_key "transactions", "users"
 end

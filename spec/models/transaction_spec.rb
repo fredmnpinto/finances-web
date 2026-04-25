@@ -19,7 +19,7 @@ RSpec.describe Transaction, type: :model do
     end
 
     it 'is invalid without date' do
-      subject.date = nil
+      subject.transaction_date = nil
       expect(subject).not_to be_valid
     end
 

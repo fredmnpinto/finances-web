@@ -29,9 +29,9 @@ RSpec.describe 'Dashboard', type: :feature do
 
     it 'shows summary cards with transaction data' do
       # Create test transactions for the current month
-      create(:transaction, :income, user: user, amount: 3000.00, date: Date.current)
-      create(:transaction, user: user, amount: -500.00, date: Date.current, description: 'Rent')
-      create(:transaction, user: user, amount: -100.00, date: Date.current, description: 'Groceries')
+      create(:transaction, :income, user: user, amount: 3000.00, transaction_date: Date.current)
+      create(:transaction, user: user, amount: -500.00, transaction_date: Date.current, description: 'Rent')
+      create(:transaction, user: user, amount: -100.00, transaction_date: Date.current, description: 'Groceries')
 
       visit authenticated_root_path
 
@@ -41,9 +41,9 @@ RSpec.describe 'Dashboard', type: :feature do
     end
 
     it 'shows largest expenses section' do
-      create(:transaction, user: user, amount: -1000.00, date: Date.current, description: 'Rent')
-      create(:transaction, user: user, amount: -200.00, date: Date.current, description: 'Groceries')
-      create(:transaction, user: user, amount: -50.00, date: Date.current, description: 'Coffee')
+      create(:transaction, user: user, amount: -1000.00, transaction_date: Date.current, description: 'Rent')
+      create(:transaction, user: user, amount: -200.00, transaction_date: Date.current, description: 'Groceries')
+      create(:transaction, user: user, amount: -50.00, transaction_date: Date.current, description: 'Coffee')
 
       visit authenticated_root_path
 
@@ -56,9 +56,9 @@ RSpec.describe 'Dashboard', type: :feature do
       food_category = create(:category, name: "Food-#{SecureRandom.hex(4)}", user: user)
       transport_category = create(:category, name: "Transport-#{SecureRandom.hex(4)}", user: user)
 
-      create(:transaction, user: user, amount: -200.00, date: Date.current, category: food_category)
-      create(:transaction, user: user, amount: -300.00, date: Date.current, category: transport_category)
-      create(:transaction, user: user, amount: -100.00, date: Date.current, category: food_category)
+      create(:transaction, user: user, amount: -200.00, transaction_date: Date.current, category: food_category)
+      create(:transaction, user: user, amount: -300.00, transaction_date: Date.current, category: transport_category)
+      create(:transaction, user: user, amount: -100.00, transaction_date: Date.current, category: food_category)
 
       visit authenticated_root_path
 
@@ -71,8 +71,8 @@ RSpec.describe 'Dashboard', type: :feature do
       food_category = create(:category, name: "Food-#{SecureRandom.hex(4)}", user: user)
       transport_category = create(:category, name: "Transport-#{SecureRandom.hex(4)}", user: user)
 
-      create(:transaction, user: user, amount: -200.00, date: Date.current, category: food_category)
-      create(:transaction, user: user, amount: -300.00, date: Date.current, category: transport_category)
+      create(:transaction, user: user, amount: -200.00, transaction_date: Date.current, category: food_category)
+      create(:transaction, user: user, amount: -300.00, transaction_date: Date.current, category: transport_category)
 
       visit authenticated_root_path
 
@@ -83,8 +83,8 @@ RSpec.describe 'Dashboard', type: :feature do
       food_category = create(:category, name: "Food-#{SecureRandom.hex(4)}", user: user)
       transport_category = create(:category, name: "Transport-#{SecureRandom.hex(4)}", user: user)
 
-      create(:transaction, user: user, amount: -200.00, date: Date.current, category: food_category)
-      create(:transaction, user: user, amount: -300.00, date: Date.current, category: transport_category)
+      create(:transaction, user: user, amount: -200.00, transaction_date: Date.current, category: food_category)
+      create(:transaction, user: user, amount: -300.00, transaction_date: Date.current, category: transport_category)
 
       visit authenticated_root_path
 

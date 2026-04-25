@@ -12,7 +12,7 @@ FactoryBot.define do
   factory :transaction do
     amount { -50.00 }
     description { Faker::Restaurant.name }
-    date { Date.current }
+transaction_date { Date.current }
     value_date { Date.current }
     balance { 1000.00 }
     source_file { "import.csv" }

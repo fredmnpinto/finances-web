@@ -3,7 +3,7 @@ class TransactionsController < ApplicationController
     @month = resolve_month(params[:year], params[:month])
     @range = @month.beginning_of_month..@month.end_of_month
 
-    base_transactions = current_user.transactions.where(date: @range)
+    base_transactions = current_user.transactions.where(transaction_date: @range)
     @category_confirmation_filter = params[:category_confirmation_filter] || "all"
 
     filtered =
@@ -12,7 +12,7 @@ class TransactionsController < ApplicationController
         .then { |rel| filter_by_search(rel) }
         .then { |rel| filter_by_amount_type(rel) }
         .then { |rel| filter_by_transaction_type(rel) }
-        .order(date: :desc, id: :desc)
+        .order(transaction_date: :desc, id: :desc)
 
     @transactions =
       filtered
@@ -86,7 +86,7 @@ class TransactionsController < ApplicationController
 
     updated_count = 0
     current_user.transactions
-      .where(date: @range)
+      .where(transaction_date: @range)
       .where.not(suggested_category_id: nil)
       .where(category_id: nil)
       .find_each do |tx|

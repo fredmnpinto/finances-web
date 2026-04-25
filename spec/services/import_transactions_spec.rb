@@ -49,8 +49,8 @@ RSpec.describe ImportTransactions do
       it 'sets transaction type based on amount' do
         import_service.call(file)
 
-        expense = Transaction.order(:date).first
-        income = Transaction.order(:date).last
+        expense = Transaction.order(:transaction_date).first
+        income = Transaction.order(:transaction_date).last
 
         expect(expense.transaction_type).to eq('expense')
         expect(income.transaction_type).to eq('income')
@@ -149,7 +149,7 @@ RSpec.describe ImportTransactions do
       )
 
       result = import_service.send(:parse_xls, file)
-      expect(result.first[:date].year).to eq(2024)
+      expect(result.first[:transaction_date].year).to eq(2024)
     end
   end
 

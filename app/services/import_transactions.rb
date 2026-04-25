@@ -1,6 +1,6 @@
 class ImportTransactions
   COLUMN_MAP = {
-    "Data Mov." => :date,
+    "Data Mov." => :transaction_date,
     "Data Valor" => :value_date,
     "Descrição do Movimento" => :description,
     "Valor em EUR" => :amount,
@@ -16,10 +16,10 @@ class ImportTransactions
     imported_count = 0
 
     rows.each do |row|
-      next if row[:date].nil? || row[:description].nil? || row[:amount].nil?
+      next if row[:transaction_date].nil? || row[:description].nil? || row[:amount].nil?
 
       transaction = @user.transactions.find_or_initialize_by(
-        date: row[:date],
+        transaction_date: row[:transaction_date],
         description: row[:description],
         amount: row[:amount],
         balance: row[:balance]
@@ -67,7 +67,7 @@ class ImportTransactions
       next if row.compact.empty?
 
       hash = headers.zip(row).to_h
-      hash[:date] = parse_date(hash[:date])
+      hash[:transaction_date] = parse_date(hash[:transaction_date])
       hash[:value_date] = parse_date(hash[:value_date])
       hash[:amount] = parse_amount(hash[:amount])
       hash[:balance] = parse_amount(hash[:balance])
