@@ -382,4 +382,108 @@ RSpec.describe ImportTransactions do
       expect(transaction.suggested_category.name).to eq('Utilities')
     end
   end
+
+  describe 'async categorization behavior' do
+    let(:file) { fixture_file_upload('test.csv', 'text/csv') }
+    let(:spreadsheet) { instance_double(Roo::Excelx) }
+    let(:sheet) { instance_double(Roo::Excelx) }
+    let(:category_test_user) { create(:user, email: "test#{SecureRandom.hex(8)}@example.com") }
+
+    before do
+      Transaction.where(user: category_test_user).delete_all
+      Category.where(user: category_test_user).delete_all
+      Category.find_or_create_by!(user: category_test_user, name: "Salary")
+      Category.find_or_create_by!(user: category_test_user, name: "Food")
+
+      allow(Roo::Spreadsheet).to receive(:open).and_return(spreadsheet)
+      allow(spreadsheet).to receive(:sheet).with(0).and_return(sheet)
+      allow(CategoryRecommender).to receive(:new).and_call_original
+    end
+
+    subject(:import_service) { described_class.new(category_test_user) }
+
+    context 'when async improvement is enabled' do
+      before do
+        allow(AsyncCategoryImprovement).to receive(:enabled?).and_return(true)
+      end
+
+      it 'schedules CategorizeTransactionJob when rules return nil' do
+        test_description = 'UNKNOWN VENDOR NO RULES'
+
+        allow(sheet).to receive(:first_row).and_return(1)
+        allow(sheet).to receive(:last_row).and_return(2)
+        allow(sheet).to receive(:row).with(1).and_return(
+          [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+        )
+        allow(sheet).to receive(:row).with(2).and_return(
+          [ '15-01-2024', '15-01-2024', test_description, '-50.00', '1000.00' ]
+        )
+
+        expect(CategorizeTransactionJob).to receive(:perform_later)
+        import_service.call(file)
+      end
+
+      it 'does NOT schedule job when rules match' do
+        # Create a transaction that matches the "salary" rule
+        test_description = 'CLOUDFLARE PORTUGAL SALARY'
+
+        allow(sheet).to receive(:first_row).and_return(1)
+        allow(sheet).to receive(:last_row).and_return(2)
+        allow(sheet).to receive(:row).with(1).and_return(
+          [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+        )
+        allow(sheet).to receive(:row).with(2).and_return(
+          [ '15-01-2024', '15-01-2024', test_description, '2500.00', '1000.00' ]
+        )
+
+        expect(CategorizeTransactionJob).not_to receive(:perform_later)
+        import_service.call(file)
+
+        # Verify transaction was categorized by rules
+        transaction = Transaction.where(user: category_test_user, description: test_description).first!
+        expect(transaction.suggested_category.name).to eq('Salary')
+      end
+    end
+
+    context 'when async improvement is disabled' do
+      before do
+        allow(AsyncCategoryImprovement).to receive(:enabled?).and_return(false)
+      end
+
+      it 'does NOT schedule job when feature flag is disabled' do
+        test_description = 'UNKNOWN VENDOR NO RULES'
+
+        allow(sheet).to receive(:first_row).and_return(1)
+        allow(sheet).to receive(:last_row).and_return(2)
+        allow(sheet).to receive(:row).with(1).and_return(
+          [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+        )
+        allow(sheet).to receive(:row).with(2).and_return(
+          [ '15-01-2024', '15-01-2024', test_description, '-50.00', '1000.00' ]
+        )
+
+        expect(CategorizeTransactionJob).not_to receive(:perform_later)
+        import_service.call(file)
+      end
+    end
+
+    it 'import continues immediately after scheduling job (non-blocking)' do
+      allow(AsyncCategoryImprovement).to receive(:enabled?).and_return(true)
+      test_description = 'UNKNOWN VENDOR NO RULES'
+
+      allow(sheet).to receive(:first_row).and_return(1)
+      allow(sheet).to receive(:last_row).and_return(2)
+      allow(sheet).to receive(:row).with(1).and_return(
+        [ 'Data Mov.', 'Data Valor', 'Descrição do Movimento', 'Valor em EUR', 'Saldo em EUR' ]
+      )
+      allow(sheet).to receive(:row).with(2).and_return(
+        [ '15-01-2024', '15-01-2024', test_description, '-50.00', '1000.00' ]
+      )
+
+      # Import should complete immediately - verify job is scheduled via perform_later
+      expect(CategorizeTransactionJob).to receive(:perform_later)
+      result = import_service.call(file)
+      expect(result).to eq(1) # Should return count immediately
+    end
+  end
 end

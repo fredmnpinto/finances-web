@@ -32,16 +32,23 @@ class ImportTransactions
         begin
           result = categorizer.categorize(
             description: row[:description],
-            amount: row[:amount]
+            amount: row[:amount],
+            source: :rules # Always rules first
           )
-
-          transaction.suggested_category = result[:category]
         rescue StandardError => e
           Rails.logger.error("Categorizer failed to categorize transaction #{transaction.description}: #{e.message}")
           Rails.logger.error(e.backtrace)
         end
 
         transaction.save!
+
+        if result
+          transaction.suggested_category = result[:category]
+          transaction.save!
+        elsif async_improvement_enabled?
+          CategorizeTransactionJob.perform_later(transaction.id, source: :llm)
+        end
+
         imported_count += 1
       end
     end
@@ -113,5 +120,9 @@ class ImportTransactions
     return :income if amount.positive?
     return :savings if amount.to_s.match?(/poupanca|deposito|mobilizacao/i)
     :expense
+  end
+
+  def async_improvement_enabled?
+    AsyncCategoryImprovement.enabled?
   end
 end

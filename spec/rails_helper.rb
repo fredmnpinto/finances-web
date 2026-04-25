@@ -14,6 +14,9 @@ require 'faker'
 require 'factory_bot_rails'
 require 'rails-controller-testing'
 require 'timecop'
+
+# Force async adapter in test environment (SolidQueue requires tables that don't exist in test DB)
+ActiveJob::Base.queue_adapter = :async
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in

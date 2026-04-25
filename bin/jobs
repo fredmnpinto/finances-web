@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/nix/store/zdmm3q9bx5nnxrw01alg6qcmf0f9jmbn-ruby-3.4.3/bin/ruby
 
 require_relative "../config/environment"
 require "solid_queue/cli"
