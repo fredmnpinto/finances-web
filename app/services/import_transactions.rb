@@ -29,8 +29,8 @@ class ImportTransactions
         transaction.source_file = file.original_filename
         transaction.transaction_type = determine_type(row[:amount])
 
-        result = begin
-          categorizer.categorize(
+        begin
+          result = categorizer.categorize(
             description: row[:description],
             amount: row[:amount]
           )
@@ -38,6 +38,7 @@ class ImportTransactions
           transaction.suggested_category = result[:category]
         rescue StandardError => e
           Rails.logger.error("Categorizer failed to categorize transaction #{transaction.description}: #{e.message}")
+          Rails.logger.error(e.backtrace)
         end
 
         transaction.save!
