@@ -72,6 +72,7 @@ steps:
     commands:
       - docker compose pull web
       - docker compose up -d web
+      - docker compose run --rm web /bin/finances-web rails db:migrate
     depends_on:
       - push
     when:
@@ -94,5 +95,3 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: adminpass
       POSTGRES_DB: finances_web_test
-
-
