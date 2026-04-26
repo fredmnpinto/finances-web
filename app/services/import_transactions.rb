@@ -45,8 +45,6 @@ class ImportTransactions
         if result
           transaction.suggested_category = result[:category]
           transaction.save!
-        elsif async_improvement_enabled?
-          CategorizeTransactionJob.perform_later(transaction.id, source: :llm)
         end
 
         imported_count += 1

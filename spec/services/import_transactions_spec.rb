@@ -407,7 +407,7 @@ RSpec.describe ImportTransactions do
         allow(AsyncCategoryImprovement).to receive(:enabled?).and_return(true)
       end
 
-      it 'schedules CategorizeTransactionJob when rules return nil' do
+      it 'creates transaction with nil suggested_category when rules return nil' do
         test_description = 'UNKNOWN VENDOR NO RULES'
 
         allow(sheet).to receive(:first_row).and_return(1)
@@ -419,8 +419,11 @@ RSpec.describe ImportTransactions do
           [ '15-01-2024', '15-01-2024', test_description, '-50.00', '1000.00' ]
         )
 
-        expect(CategorizeTransactionJob).to receive(:perform_later)
         import_service.call(file)
+
+        # Verify transaction was saved with nil suggested_category
+        transaction = Transaction.where(user: category_test_user, description: test_description).first!
+        expect(transaction.suggested_category).to be_nil
       end
 
       it 'does NOT schedule job when rules match' do
@@ -467,7 +470,7 @@ RSpec.describe ImportTransactions do
       end
     end
 
-    it 'import continues immediately after scheduling job (non-blocking)' do
+    it 'import continues immediately after saving transaction (non-blocking)' do
       allow(AsyncCategoryImprovement).to receive(:enabled?).and_return(true)
       test_description = 'UNKNOWN VENDOR NO RULES'
 
@@ -480,10 +483,13 @@ RSpec.describe ImportTransactions do
         [ '15-01-2024', '15-01-2024', test_description, '-50.00', '1000.00' ]
       )
 
-      # Import should complete immediately - verify job is scheduled via perform_later
-      expect(CategorizeTransactionJob).to receive(:perform_later)
+      # Import should complete immediately - job is scheduled via after_commit later
       result = import_service.call(file)
-      expect(result).to eq(1) # Should return count immediately
+      expect(result).to eq(1)
+
+      # Verify transaction was saved with nil suggested_category
+      transaction = Transaction.where(user: category_test_user, description: test_description).first!
+      expect(transaction.suggested_category).to be_nil
     end
   end
 end
