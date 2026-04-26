@@ -124,6 +124,37 @@ These override anything set in shellHook. System ruby bypasses this wrapper enti
 
 ---
 
+## Background Jobs (SolidQueue)
+
+This project uses SolidQueue for background jobs.
+
+### Running Jobs
+
+```bash
+# Development: runs via Puma plugin automatically
+bin/dev
+
+# Or run separately
+bin/jobs
+```
+
+### Monitoring Jobs
+
+```ruby
+# In rails console
+SolidQueue::Job.where(class_name: "CategorizeTransactionJob")
+SolidQueue::FailedExecution.all
+
+# Check queue tables
+SolidQueue::ReadyExecution.all
+```
+
+### Feature Flags
+
+- `ASYNC_CATEGORY_ENABLED=false` - Disable async LLM categorization
+
+---
+
 ## Boundaries
 
 ✅ **Always do:**
