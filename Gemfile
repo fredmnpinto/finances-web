@@ -49,6 +49,9 @@ gem "kamal", require: false
 gem "sentry-ruby"
 gem "sentry-rails"
 
+# Structured logging for Loki
+gem "lograge"
+
 # Parse Excel files
 gem "roo", "~> 2.10"
 

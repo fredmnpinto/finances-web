@@ -37,6 +37,18 @@ Rails.application.configure do
   config.log_tags = [ :request_id ]
   config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
 
+  # Lograge: Structured JSON logging for Loki
+  config.lograge.enabled = true
+  config.lograge.json = true
+  config.lograge.custom_payload do |controller|
+    {
+      request_id: controller.request.request_id,
+      host: controller.request.host,
+      remote_ip: controller.request.remote_ip,
+      log_level: "info"
+    }
+  end
+
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 

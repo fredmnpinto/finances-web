@@ -699,6 +699,17 @@
     };
     version = "1.7.0";
   };
+  lograge = {
+    dependencies = ["actionpack" "activesupport" "railties" "request_store"];
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "1qcsvh9k4c0cp6agqm9a8m4x2gg7vifryqr7yxkg2x9ph9silds2";
+      type = "gem";
+    };
+    version = "0.14.0";
+  };
   loofah = {
     dependencies = ["crass" "nokogiri"];
     groups = ["default" "development" "test"];
@@ -1228,6 +1239,17 @@
       type = "gem";
     };
     version = "0.6.3";
+  };
+  request_store = {
+    dependencies = ["rack"];
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "1jw89j9s5p5cq2k7ffj5p4av4j4fxwvwjs1a4i9g85d38r9mvdz1";
+      type = "gem";
+    };
+    version = "1.7.0";
   };
   responders = {
     dependencies = ["actionpack" "railties"];
