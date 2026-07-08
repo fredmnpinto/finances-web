@@ -53,7 +53,7 @@ gem "sentry-rails"
 gem "lograge"
 
 # Parse Excel files
-gem "roo", "~> 2.10"
+gem "roo", "~> 3.0"
 
 # CSV support for roo (Ruby 3.4+)
 gem "csv"
